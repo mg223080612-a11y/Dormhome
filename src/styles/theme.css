@@ -4,18 +4,20 @@
   background: #ffffff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
   /* design tokens — minimal flat UI */
-  --ink: #1a1a1a;
+  --ink: #14151a;
   --ink-soft: #6b7280;
   --line: #ececec;
   --surface: #ffffff;
-  --radius-lg: 1.5rem;
+  --radius-lg: 1.6rem;
   --radius-md: 1.15rem;
   --radius-sm: 0.85rem;
-  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.05);
-  --shadow-md: 0 10px 30px rgba(17, 24, 39, 0.07);
-  --shadow-lg: 0 20px 48px rgba(17, 24, 39, 0.12);
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 1px rgba(17, 24, 39, 0.03);
+  --shadow-md: 0 12px 34px rgba(17, 24, 39, 0.08);
+  --shadow-lg: 0 24px 60px rgba(17, 24, 39, 0.14);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* department theming fallbacks */
@@ -38,7 +40,30 @@ body,
 }
 
 body {
-  background: #ffffff;
+  background: #f6f7f9;
+}
+
+/* subtle scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d8 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #b5b5bd;
+  background-clip: padding-box;
 }
 
 button,

@@ -40,12 +40,32 @@ button.stat-card:hover,
 }
 
 .stat-card {
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 0.4rem;
   min-height: 9rem;
-  padding: 1.3rem;
+  padding: 1.4rem;
   color: var(--ink);
   text-align: left;
+}
+
+button.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 1.4rem;
+  right: 1.4rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: var(--dept-color);
+  opacity: 0.35;
+  transition: opacity 0.28s var(--ease), transform 0.28s var(--ease);
+}
+
+button.stat-card:hover::after {
+  opacity: 1;
+  transform: scale(1.25);
 }
 
 .stat-card span,
@@ -55,9 +75,15 @@ button.stat-card:hover,
   color: var(--ink-soft);
 }
 
+.stat-card span {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 .stat-card strong {
   color: var(--ink);
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
   letter-spacing: -0.04em;
 }
 
@@ -99,11 +125,12 @@ button.stat-card:hover,
 .link-button {
   border: 0;
   border-radius: 999px;
-  padding: 0.7rem 1.15rem;
+  padding: 0.7rem 1.2rem;
   background: var(--dept-color);
   color: var(--dept-text);
   font-weight: 800;
-  transition: transform 0.2s var(--ease), filter 0.2s var(--ease);
+  box-shadow: 0 8px 20px -10px var(--dept-color);
+  transition: transform 0.2s var(--ease), filter 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 
 .wide-card-title button:hover,
@@ -112,8 +139,9 @@ button.stat-card:hover,
 .stack-form button:hover,
 .page-card button:hover,
 .link-button:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   filter: brightness(1.08);
+  box-shadow: 0 14px 26px -10px var(--dept-color);
 }
 
 .ghost-button {
@@ -403,6 +431,9 @@ button.media-card {
   height: 9rem;
   border-radius: var(--radius-sm);
   background: var(--dept-soft);
+  background:
+    radial-gradient(120px 80px at 30% 20%, color-mix(in srgb, var(--dept-color) 22%, transparent), transparent 70%),
+    var(--dept-soft);
   color: var(--dept-color);
   font-size: 3rem;
   margin-bottom: 0.85rem;
