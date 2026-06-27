@@ -22,7 +22,9 @@ export default function Layout({
       style={{
         '--dept-color': dept.color,
         '--dept-soft': dept.soft,
-        '--dept-text': dept.text
+        '--dept-text': dept.text,
+        '--dept-card': dept.card,
+        '--dept-line': dept.line
       }}
     >
       <header className="top-bar">
@@ -31,7 +33,6 @@ export default function Layout({
         </button>
 
         <div className="top-menu-pill">
-          <span>학생회, 자치위원, 신문부, 홍보대사, GMB, 자치법정</span>
           <DepartmentSwitcher selectedDepartment={selectedDepartment} onChange={setSelectedDepartment} />
         </div>
 

@@ -6,9 +6,20 @@ const average = (items) => {
   return Math.round(items.reduce((sum, item) => sum + item.progress, 0) / items.length);
 };
 
+const pickNextEvent = (events) => {
+  const today = new Date();
+  const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const upcoming = events
+    .filter((event) => new Date(`${event.date}T00:00:00`) >= todayOnly)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  if (upcoming.length) return upcoming[0];
+  // 다가오는 일정이 없으면 가장 최근 일정을 보여 줍니다.
+  return [...events].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+};
+
 export default function Dashboard({ onNavigate }) {
   const todayMeal = weeklyMeals[0];
-  const nextEvent = academicEvents[0];
+  const nextEvent = pickNextEvent(academicEvents);
 
   return (
     <div className="dashboard-grid">

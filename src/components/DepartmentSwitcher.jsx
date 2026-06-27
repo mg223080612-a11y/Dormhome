@@ -10,7 +10,7 @@ export default function DepartmentSwitcher({ selectedDepartment, onChange }) {
             key={dept.id}
             type="button"
             className={isActive ? 'dept-chip active' : 'dept-chip'}
-            style={isActive ? { '--chip-bg': dept.color, '--chip-text': dept.text } : {}}
+            style={{ '--chip-bg': dept.color, '--chip-text': dept.text }}
             onClick={() => onChange(dept.id)}
             title={dept.description}
           >
