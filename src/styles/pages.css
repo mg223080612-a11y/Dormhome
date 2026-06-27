@@ -1,0 +1,398 @@
+.dashboard-grid,
+.list-grid,
+.media-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.dashboard-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stat-card,
+.wide-card,
+.page-card,
+.simple-card,
+.progress-card,
+.countdown-card,
+.verse-card,
+.notice-card,
+.empty-state,
+.media-card {
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 1.4rem;
+  box-shadow: 0 12px 34px rgba(17, 24, 39, 0.07);
+}
+
+.stat-card {
+  display: grid;
+  gap: 0.4rem;
+  min-height: 9rem;
+  border: 0;
+  padding: 1.2rem;
+  color: #344054;
+  text-align: left;
+}
+
+button.stat-card:hover,
+.media-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-card span,
+.stat-card small,
+.wide-card small,
+.simple-card small {
+  color: #667085;
+}
+
+.stat-card strong {
+  color: #111827;
+  font-size: 1.35rem;
+  letter-spacing: -0.04em;
+}
+
+.wide-card {
+  grid-column: span 2;
+  padding: 1.4rem;
+}
+
+.wide-card.muted {
+  background: var(--dept-soft);
+}
+
+.wide-card h2,
+.wide-card p {
+  margin: 0.6rem 0;
+}
+
+.wide-card-title,
+.between,
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.wide-card-title span {
+  color: var(--dept-color);
+  font-weight: 900;
+}
+
+.wide-card-title button,
+.button-row button,
+.inline-form button,
+.stack-form button,
+.page-card button,
+.link-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  background: var(--dept-color);
+  color: var(--dept-text);
+  font-weight: 900;
+}
+
+.ghost-button {
+  background: #f2f4f7 !important;
+  color: #344054 !important;
+}
+
+.page-card {
+  padding: 1.4rem;
+}
+
+.page-card-head {
+  margin-bottom: 1rem;
+}
+
+.page-card h2 {
+  margin: 0;
+  font-size: 1.65rem;
+  letter-spacing: -0.05em;
+}
+
+.page-card-head p {
+  margin: 0.45rem 0 0;
+  color: #667085;
+  line-height: 1.6;
+}
+
+.timeline {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.timeline.compact {
+  max-width: 720px;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 1.2rem;
+  background: #ffffff;
+}
+
+.date-box {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem;
+  border-radius: 1rem;
+  background: var(--dept-soft);
+  color: var(--dept-color);
+}
+
+.date-box small {
+  color: #667085;
+}
+
+.timeline-item h3,
+.timeline-item p,
+.simple-card h3,
+.simple-card p,
+.progress-card h3,
+.progress-card p,
+.countdown-card span,
+.countdown-card strong,
+.countdown-card small,
+.verse-card h2,
+.verse-card p {
+  margin: 0;
+}
+
+.list-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.simple-card,
+.progress-card,
+.countdown-card,
+.notice-card,
+.empty-state {
+  padding: 1.1rem;
+}
+
+.simple-card,
+.progress-card {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.8rem;
+  border-radius: 999px;
+  padding: 0 0.7rem;
+  background: var(--dept-soft);
+  color: var(--dept-color);
+  font-size: 0.84rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.progress-track {
+  height: 0.7rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf0f3;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--dept-color);
+}
+
+.inline-form,
+.stack-form {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 1.2rem;
+  background: #ffffff;
+}
+
+.inline-form {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+}
+
+.stack-form {
+  max-width: 760px;
+}
+
+.inline-form input,
+.inline-form select,
+.stack-form input,
+.stack-form select,
+.stack-form textarea {
+  min-height: 2.85rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 0.9rem;
+  padding: 0 0.85rem;
+  background: #ffffff;
+}
+
+.stack-form textarea {
+  min-height: 7rem;
+  padding-top: 0.85rem;
+  resize: vertical;
+}
+
+.top-gap {
+  margin-top: 1rem;
+}
+
+.meal-table {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.meal-row {
+  display: grid;
+  grid-template-columns: 4rem repeat(3, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 1.1rem;
+  background: #ffffff;
+}
+
+.meal-row strong {
+  color: var(--dept-color);
+}
+
+.survey-card .link-button {
+  justify-self: start;
+}
+
+.button-row {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.countdown-card {
+  display: grid;
+  gap: 0.6rem;
+  background: var(--dept-soft);
+}
+
+.countdown-card strong {
+  color: var(--dept-color);
+  font-size: 2rem;
+  letter-spacing: -0.05em;
+}
+
+.clean-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  line-height: 1.9;
+  color: #475467;
+}
+
+.birthday-card strong {
+  color: var(--dept-color);
+  font-size: 1.6rem;
+}
+
+.verse-card {
+  padding: 1.7rem;
+  background: linear-gradient(135deg, var(--dept-color), #111827);
+  color: #ffffff;
+}
+
+.verse-card span {
+  opacity: 0.85;
+  font-weight: 900;
+}
+
+.verse-card h2 {
+  margin: 1rem 0;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  line-height: 1.35;
+  letter-spacing: -0.06em;
+}
+
+.media-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.media-card {
+  padding: 1rem;
+  transition: transform 0.16s ease;
+}
+
+.media-thumb {
+  display: grid;
+  place-items: center;
+  height: 9rem;
+  border-radius: 1rem;
+  background: var(--dept-soft);
+  color: var(--dept-color);
+  font-size: 3rem;
+  margin-bottom: 0.8rem;
+}
+
+.media-card h3,
+.media-card p {
+  margin: 0.3rem 0;
+}
+
+.media-card p {
+  color: #667085;
+}
+
+.empty-state {
+  color: #667085;
+}
+
+.notice-card {
+  margin-bottom: 1rem;
+  background: var(--dept-soft);
+  color: #344054;
+}
+
+@media (max-width: 1180px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .inline-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .media-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .dashboard-grid,
+  .list-grid,
+  .media-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wide-card {
+    grid-column: span 1;
+  }
+
+  .timeline-item,
+  .meal-row,
+  .inline-form {
+    grid-template-columns: 1fr;
+  }
+
+  .between,
+  .toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
