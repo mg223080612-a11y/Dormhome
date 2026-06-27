@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Login from './components/Login';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
+import DepartmentPage from './pages/DepartmentPage';
 import {
   AcademicPage,
   BirthdayPage,
@@ -31,10 +32,23 @@ const readPageFromHash = () => {
   return value || 'home';
 };
 
+function LoginRequired({ feature, onLoginClick }) {
+  return (
+    <section className="page-card">
+      <div className="page-card-head">
+        <h2>로그인이 필요합니다</h2>
+        <p>{feature} 기능은 로그인 후 이용할 수 있습니다.</p>
+      </div>
+      <button type="button" className="link-button" onClick={onLoginClick}>로그인하기</button>
+    </section>
+  );
+}
+
 export default function App() {
   const [session, setSession] = useState(() => loadSession());
   const [selectedDepartment, setSelectedDepartment] = useState('studentCouncil');
   const [activePage, setActivePage] = useState(readPageFromHash);
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     const handleHashChange = () => setActivePage(readPageFromHash());
@@ -47,25 +61,39 @@ export default function App() {
     setActivePage(page);
   };
 
+  const selectDepartment = (id) => {
+    setSelectedDepartment(id);
+    navigate('department');
+  };
+
+  const handleLogin = (newSession) => {
+    setSession(newSession);
+    setShowLogin(false);
+  };
+
   const logout = () => {
     clearSession();
     setSession(null);
     window.location.hash = '#/home';
   };
 
-  if (!session) {
-    return <Login onLogin={setSession} />;
+  if (showLogin) {
+    return <Login onLogin={handleLogin} onCancel={() => setShowLogin(false)} />;
   }
+
+  const guard = (node, feature) =>
+    session ? node : <LoginRequired feature={feature} onLoginClick={() => setShowLogin(true)} />;
 
   const pageMap = {
     home: <Dashboard onNavigate={navigate} />,
+    department: <DepartmentPage department={selectedDepartment} onNavigate={navigate} />,
     calendar: <CalendarPage />,
     pledges: <PledgePage />,
-    taxiMate: <TaxiMatePage session={session} />,
-    suggestions: <SuggestionPage session={session} />,
+    taxiMate: guard(<TaxiMatePage session={session} />, '택시메이트'),
+    suggestions: guard(<SuggestionPage session={session} />, '건의함'),
     meal: <MealPage />,
     survey: <SurveyPage />,
-    dormRepair: <DormRepairPage session={session} />,
+    dormRepair: guard(<DormRepairPage session={session} />, '기숙사 수리 요청'),
     academic: <AcademicPage />,
     points: <PointsPage />,
     tips: <TipsPage />,
@@ -82,10 +110,11 @@ export default function App() {
     <Layout
       session={session}
       selectedDepartment={selectedDepartment}
-      setSelectedDepartment={setSelectedDepartment}
+      onSelectDepartment={selectDepartment}
       activePage={activePage}
       onNavigate={navigate}
       onLogout={logout}
+      onLoginClick={() => setShowLogin(true)}
     >
       {pageMap[activePage] || <NotFoundPage onNavigate={navigate} />}
     </Layout>

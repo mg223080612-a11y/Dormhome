@@ -15,7 +15,6 @@ import {
   weeklyVerse
 } from '../data/mockData';
 import { addStorageItem, readStorage, writeStorage } from '../utils/storage';
-import { genderLabel } from '../utils/auth';
 
 const dateLabel = (value) => {
   const date = new Date(`${value}T00:00:00`);
@@ -81,18 +80,15 @@ export function PledgePage() {
 export function TaxiMatePage({ session }) {
   const [items, setItems] = useState(() => readStorage('taxi-requests', initialTaxiRequests));
   const [form, setForm] = useState({ date: '', time: '', destination: '', max: 4, memo: '' });
-  const visibleItems = items.filter((item) => item.gender === session.gender);
-  const canUse = session.gender === 'female' || session.gender === 'male';
 
   const submit = (event) => {
     event.preventDefault();
-    if (!canUse || !form.date || !form.time || !form.destination) return;
+    if (!form.date || !form.time || !form.destination) return;
 
     const next = addStorageItem(
       'taxi-requests',
       {
         ...form,
-        gender: session.gender,
         author: session.name,
         max: Number(form.max)
       },
@@ -105,40 +101,30 @@ export function TaxiMatePage({ session }) {
   return (
     <PageShell
       title="택시메이트"
-      description="MG 끝자리로 구분된 그룹만 보이도록 만든 화면입니다. 실제 운영 시에는 서버 권한 규칙으로 보호해야 합니다."
+      description="함께 택시를 탈 친구를 찾는 화면입니다. 실제 운영 시에는 서버 권한 규칙으로 보호해야 합니다."
     >
-      <div className="notice-card">
-        현재 로그인 그룹: <b>{genderLabel(session.gender)}</b>
+      <form className="inline-form" onSubmit={submit}>
+        <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+        <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} />
+        <input placeholder="목적지" value={form.destination} onChange={(e) => setForm({ ...form, destination: e.target.value })} />
+        <input type="number" min="2" max="6" value={form.max} onChange={(e) => setForm({ ...form, max: e.target.value })} />
+        <input placeholder="메모" value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} />
+        <button type="submit">등록</button>
+      </form>
+
+      <div className="list-grid">
+        {items.map((item) => (
+          <article key={item.id} className="simple-card">
+            <div className="between">
+              <h3>{item.destination}</h3>
+              <span className="badge">최대 {item.max}명</span>
+            </div>
+            <p>{item.date} {item.time}</p>
+            <small>{item.memo || '메모 없음'} · 작성자 {item.author}</small>
+          </article>
+        ))}
+        {items.length === 0 && <EmptyState text="아직 등록된 택시메이트가 없습니다." />}
       </div>
-
-      {!canUse ? (
-        <EmptyState text="MG 끝자리로 그룹을 확인하지 못했습니다. auth.js의 GENDER_RULE을 확인해 주세요." />
-      ) : (
-        <>
-          <form className="inline-form" onSubmit={submit}>
-            <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-            <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} />
-            <input placeholder="목적지" value={form.destination} onChange={(e) => setForm({ ...form, destination: e.target.value })} />
-            <input type="number" min="2" max="6" value={form.max} onChange={(e) => setForm({ ...form, max: e.target.value })} />
-            <input placeholder="메모" value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} />
-            <button type="submit">등록</button>
-          </form>
-
-          <div className="list-grid">
-            {visibleItems.map((item) => (
-              <article key={item.id} className="simple-card">
-                <div className="between">
-                  <h3>{item.destination}</h3>
-                  <span className="badge">최대 {item.max}명</span>
-                </div>
-                <p>{item.date} {item.time}</p>
-                <small>{item.memo || '메모 없음'} · 작성자 {item.author}</small>
-              </article>
-            ))}
-            {visibleItems.length === 0 && <EmptyState text="아직 등록된 택시메이트가 없습니다." />}
-          </div>
-        </>
-      )}
     </PageShell>
   );
 }

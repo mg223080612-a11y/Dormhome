@@ -2,19 +2,21 @@ import DepartmentSwitcher from './DepartmentSwitcher';
 import Sidebar from './Sidebar';
 import { getDepartment } from '../data/departments';
 import { allMenu } from '../data/menu';
-import { genderLabel } from '../utils/auth';
 
 export default function Layout({
   session,
   selectedDepartment,
-  setSelectedDepartment,
+  onSelectDepartment,
   activePage,
   onNavigate,
   onLogout,
+  onLoginClick,
   children
 }) {
   const dept = getDepartment(selectedDepartment);
-  const pageTitle = allMenu.find((item) => item.id === activePage)?.label || '홈';
+  const pageTitle =
+    allMenu.find((item) => item.id === activePage)?.label ||
+    (activePage === 'department' ? dept.label : '홈');
 
   return (
     <div
@@ -33,13 +35,22 @@ export default function Layout({
         </button>
 
         <div className="top-menu-pill">
-          <DepartmentSwitcher selectedDepartment={selectedDepartment} onChange={setSelectedDepartment} />
+          <DepartmentSwitcher
+            selectedDepartment={selectedDepartment}
+            activePage={activePage}
+            onSelect={onSelectDepartment}
+          />
         </div>
 
         <div className="user-pill">
-          <span>{session.name}</span>
-          <small>{genderLabel(session.gender)}</small>
-          <button type="button" onClick={onLogout}>로그아웃</button>
+          {session ? (
+            <>
+              <span>{session.name}</span>
+              <button type="button" onClick={onLogout}>로그아웃</button>
+            </>
+          ) : (
+            <button type="button" onClick={onLoginClick}>로그인</button>
+          )}
         </div>
       </header>
 

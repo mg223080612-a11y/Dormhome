@@ -10,7 +10,8 @@ export const departments = [
     text: '#FFFFFF',
     card: '#FFFFFF',
     line: '#ECECEC',
-    description: '전체 공지, 공약 이행도, 스케줄 관리'
+    description: '전체 공지, 공약 이행도, 스케줄 관리',
+    focus: ['pledges', 'calendar', 'survey', 'suggestions']
   },
   {
     id: 'autonomyCommittee',
@@ -21,7 +22,8 @@ export const departments = [
     text: '#FFFFFF',
     card: '#FFFFFF',
     line: '#ECECEC',
-    description: '생활관 스케줄, 생활관 꿀팁, 수리 요청'
+    description: '생활관 스케줄, 생활관 꿀팁, 수리 요청',
+    focus: ['dormSchedule', 'tips', 'dormRepair', 'birthday']
   },
   {
     id: 'newspaper',
@@ -32,7 +34,8 @@ export const departments = [
     text: '#FFFFFF',
     card: '#FFFFF0',
     line: '#E6E2D2',
-    description: '기사, 학교 소식, 인터뷰 콘텐츠'
+    description: '기사, 학교 소식, 인터뷰 콘텐츠',
+    focus: ['shortform', 'verse', 'calendar']
   },
   {
     id: 'court',
@@ -43,7 +46,8 @@ export const departments = [
     text: '#FFFFFF',
     card: '#FFFFFF',
     line: '#ECECEC',
-    description: '상점·벌점 안내, 규정 안내, 질의응답'
+    description: '상점·벌점 안내, 규정 안내, 질의응답',
+    focus: ['points', 'suggestions']
   },
   {
     id: 'ambassador',
@@ -54,7 +58,8 @@ export const departments = [
     text: '#FFFFFF',
     card: '#FFFFFF',
     line: '#ECECEC',
-    description: '사진첩, 홍보 콘텐츠, 학교 브랜딩'
+    description: '사진첩, 홍보 콘텐츠, 학교 브랜딩',
+    focus: ['shortform', 'market']
   },
   {
     id: 'gmb',
@@ -65,7 +70,8 @@ export const departments = [
     text: '#FFFFFF',
     card: '#FFFFFF',
     line: '#E2E2E2',
-    description: '영상, 숏폼, 방송 콘텐츠'
+    description: '영상, 숏폼, 방송 콘텐츠',
+    focus: ['shortform', 'cafeteriaWish']
   }
 ];
 

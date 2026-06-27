@@ -389,6 +389,14 @@ button.stat-card:hover,
   padding: 1.1rem;
 }
 
+button.media-card {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+}
+
 .media-thumb {
   display: grid;
   place-items: center;
