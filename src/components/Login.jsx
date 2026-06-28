@@ -3,17 +3,18 @@ import { createSession, validateLogin } from '../utils/auth';
 import '../styles/login.css';
 
 export default function Login({ onLogin, onCancel }) {
-  const [mgNumber, setMgNumber] = useState('');
+  const [id, setId] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const submit = (event) => {
     event.preventDefault();
-    const message = validateLogin({ mgNumber });
+    const message = validateLogin({ id, password });
     if (message) {
       setError(message);
       return;
     }
-    onLogin(createSession({ mgNumber }));
+    onLogin(createSession({ id }));
   };
 
   return (
@@ -24,18 +25,25 @@ export default function Login({ onLogin, onCancel }) {
           <span className="login-logo-sub">MG</span>
         </div>
 
-        <h1>MG 번호로 로그인</h1>
-        <p className="login-subtitle">학교에서 사용하는 MG 번호를 입력해주세요.</p>
+        <h1>로그인</h1>
+        <p className="login-subtitle">ID와 비밀번호를 입력해주세요.</p>
 
         <form onSubmit={submit} className="login-form">
           <label>
-            <span>MG 번호</span>
+            <span>ID</span>
             <input
-              inputMode="numeric"
-              placeholder="예: 25001"
-              value={mgNumber}
-              onChange={(event) => setMgNumber(event.target.value)}
+              value={id}
+              onChange={(event) => setId(event.target.value)}
               autoFocus
+            />
+          </label>
+
+          <label>
+            <span>비밀번호</span>
+            <input
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
             />
           </label>
 
