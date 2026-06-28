@@ -2,7 +2,6 @@ import { useState } from 'react';
 import DepartmentSwitcher from './DepartmentSwitcher';
 import Sidebar from './Sidebar';
 import { getDepartment } from '../data/departments';
-import { allMenu } from '../data/menu';
 
 export default function Layout({
   session,
@@ -15,9 +14,6 @@ export default function Layout({
   children
 }) {
   const dept = getDepartment(selectedDepartment);
-  const pageTitle =
-    allMenu.find((item) => item.id === activePage)?.label ||
-    (activePage === 'department' ? dept.label : '홈');
 
   // 좁은 화면에서 사이드바 펼침 여부
   const [menuOpen, setMenuOpen] = useState(false);
@@ -45,7 +41,7 @@ export default function Layout({
     >
       <header className="top-bar">
         <button className="brand-pill" type="button" onClick={() => navigateAndClose('home')}>
-          gvcs
+          GVCS
         </button>
 
         <div className="top-menu-pill">
@@ -81,14 +77,6 @@ export default function Layout({
       <div className="main-grid">
         <Sidebar activePage={activePage} onNavigate={navigateAndClose} open={menuOpen} />
         <main className="content-panel">
-          <section className="page-hero">
-            <div>
-              <p className="eyebrow">{dept.label}</p>
-              <h1>{pageTitle}</h1>
-              <p>{dept.description}</p>
-            </div>
-          </section>
-
           {children}
         </main>
       </div>
