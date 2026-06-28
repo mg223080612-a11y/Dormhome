@@ -334,6 +334,18 @@ button.stat-card:hover {
   line-height: 1.6;
 }
 
+.department-page .page-card-head h2,
+.department-page .page-card-head p,
+.department-page .media-card h3,
+.department-page .media-card p {
+  color: var(--dept-ink);
+}
+
+.department-page .page-card-head p,
+.department-page .media-card p {
+  font-weight: 700;
+}
+
 /* 리스트/미디어 그리드 */
 .list-grid {
   display: grid;

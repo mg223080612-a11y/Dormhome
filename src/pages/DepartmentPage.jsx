@@ -8,7 +8,7 @@ export default function DepartmentPage({ department, onNavigate }) {
     .filter(Boolean);
 
   return (
-    <section className="page-card">
+    <section className="page-card department-page">
       <div className="page-card-head">
         <h2>{dept.label}</h2>
         <p>{dept.description}</p>
