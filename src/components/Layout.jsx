@@ -72,9 +72,12 @@ export default function Layout({
       </div>
 
       <footer className="site-credit">
-        <img src="/sync-mark.png" alt="" className="sync-mark" aria-hidden="true" />
-        <span>
-          made by <strong>GVCS MG coding club Sync</strong>
+        <span className="credit-prefix">made by <strong>GVCS MG coding club</strong></span>
+        <span className="credit-collab" aria-label="Sync x SOS">
+          <img src="/sync-mark.png" alt="Sync" className="sync-mark" />
+          <strong>Sync</strong>
+          <span className="credit-x">x</span>
+          <img src="/sos-mark.png" alt="SOS" className="sos-mark" />
         </span>
       </footer>
     </div>

@@ -212,7 +212,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.7rem;
+  flex-wrap: wrap;
+  gap: 0.65rem;
   max-width: 1320px;
   margin: 2.5rem auto 0;
   padding: 1.25rem 1rem;
@@ -225,6 +226,31 @@
 .site-credit strong {
   color: #4b5563;
   font-weight: 800;
+}
+
+.credit-prefix,
+.credit-collab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.credit-collab strong {
+  color: #4b5563;
+}
+
+.credit-x {
+  color: #9ca3af;
+  font-weight: 800;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.sos-mark {
+  width: 2.6rem;
+  height: 1.45rem;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .sync-mark {
