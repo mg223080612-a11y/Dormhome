@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import DepartmentSwitcher from './DepartmentSwitcher';
 import Sidebar from './Sidebar';
 import { getDepartment } from '../data/departments';
@@ -18,6 +19,20 @@ export default function Layout({
     allMenu.find((item) => item.id === activePage)?.label ||
     (activePage === 'department' ? dept.label : '홈');
 
+  // 좁은 화면에서 사이드바 펼침 여부
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // 메뉴 선택 / 부서 선택 시 사이드바를 닫습니다.
+  const navigateAndClose = (page) => {
+    setMenuOpen(false);
+    onNavigate(page);
+  };
+
+  const selectDeptAndClose = (id) => {
+    setMenuOpen(false);
+    onSelectDepartment(id);
+  };
+
   return (
     <div
       className="app-shell"
@@ -29,7 +44,7 @@ export default function Layout({
       }}
     >
       <header className="top-bar">
-        <button className="brand-pill" type="button" onClick={() => onNavigate('home')}>
+        <button className="brand-pill" type="button" onClick={() => navigateAndClose('home')}>
           gvcs
         </button>
 
@@ -37,7 +52,7 @@ export default function Layout({
           <DepartmentSwitcher
             selectedDepartment={selectedDepartment}
             activePage={activePage}
-            onSelect={onSelectDepartment}
+            onSelect={selectDeptAndClose}
           />
         </div>
 
@@ -53,8 +68,18 @@ export default function Layout({
         </div>
       </header>
 
+      {/* 좁은 화면에서만 보이는 메뉴 토글 */}
+      <button
+        type="button"
+        className="menu-toggle"
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        ··· {menuOpen ? '메뉴 닫기' : '더보기'}
+      </button>
+
       <div className="main-grid">
-        <Sidebar activePage={activePage} onNavigate={onNavigate} />
+        <Sidebar activePage={activePage} onNavigate={navigateAndClose} open={menuOpen} />
         <main className="content-panel">
           <section className="page-hero">
             <div>

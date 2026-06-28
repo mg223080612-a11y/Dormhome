@@ -14,9 +14,9 @@ function MenuButton({ item, activePage, onNavigate }) {
   );
 }
 
-export default function Sidebar({ activePage, onNavigate }) {
+export default function Sidebar({ activePage, onNavigate, open }) {
   return (
-    <aside className="sidebar">
+    <aside className={open ? 'sidebar open' : 'sidebar'}>
       <div className="sidebar-title">사이드바</div>
       <nav className="side-nav">
         <p className="side-section-title">메인</p>

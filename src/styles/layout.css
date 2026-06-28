@@ -195,6 +195,21 @@
   min-width: 0;
 }
 
+/* 메뉴 토글 버튼 (넓은 화면에서는 숨김) */
+.menu-toggle {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  padding: 0.65rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
 /* ── 페이지 히어로 (상단 포인트 라인만 부서색) ───────────── */
 .page-hero {
   display: flex;
@@ -236,24 +251,23 @@
     grid-template-columns: 1fr;
   }
 
+  /* 좁은 화면: 사이드바 숨김, '더보기' 버튼으로 펼침 */
+  .menu-toggle {
+    display: inline-flex;
+  }
+
   .sidebar {
+    display: none;
     position: static;
+    margin-bottom: 1.25rem;
+  }
+
+  .sidebar.open {
+    display: block;
   }
 
   .side-nav {
-    flex-flow: row wrap;
-    display: flex;
-    overflow-x: auto;
     max-height: none;
-  }
-
-  .sidebar-title,
-  .side-section-title {
-    width: 100%;
-  }
-
-  .side-item {
-    min-width: max-content;
   }
 }
 
