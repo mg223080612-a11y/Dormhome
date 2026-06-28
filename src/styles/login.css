@@ -7,18 +7,16 @@
   display: grid;
   place-items: center;
   padding: 2rem;
-  background:
-    radial-gradient(700px 500px at 15% 10%, #eef2ff, transparent 60%),
-    radial-gradient(700px 500px at 85% 90%, #fdeaf3, transparent 60%),
-    #0d0d10;
+  background: #ffffff;
 }
 
 .login-card {
   width: min(100%, 420px);
   padding: 2.4rem 2.2rem;
+  border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: #ffffff;
-  box-shadow: 0 30px 90px rgba(8, 10, 20, 0.45);
+  box-shadow: var(--shadow-md);
 }
 
 /* GVCS MG 로고 */

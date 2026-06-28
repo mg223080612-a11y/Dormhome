@@ -389,6 +389,93 @@ button.stat-card:hover {
   transition: width 0.4s var(--ease);
 }
 
+/* 달력 (월 그리드) */
+.calendar-title {
+  margin-bottom: 0.8rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.calendar-weekday {
+  padding: 0.4rem 0;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.calendar-weekday.sun {
+  color: #dc2626;
+}
+
+.calendar-weekday.sat {
+  color: #2563eb;
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-height: 5.5rem;
+  padding: 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+}
+
+.calendar-day.empty {
+  border: 0;
+  background: transparent;
+}
+
+.calendar-day .day-num {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.calendar-day.sun .day-num {
+  color: #dc2626;
+}
+
+.calendar-day.sat .day-num {
+  color: #2563eb;
+}
+
+/* 오늘 날짜 강조 (부서색 포인트) */
+.calendar-day.today {
+  background: var(--dept-soft);
+  border-color: var(--dept-color);
+  box-shadow: inset 0 0 0 1px var(--dept-color);
+}
+
+.cal-event {
+  overflow: hidden;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  background: var(--dept-soft);
+  color: var(--dept-ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subhead {
+  margin: 1.6rem 0 0.8rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
 /* 타임라인 (달력 / 생활관 스케줄) */
 .timeline {
   display: grid;
@@ -646,5 +733,24 @@ button.stat-card:hover {
   .toolbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  /* 달력은 7칸을 유지하되 칸/글자만 축소 */
+  .calendar-grid {
+    gap: 3px;
+  }
+
+  .calendar-day {
+    min-height: 3.4rem;
+    padding: 0.25rem;
+  }
+
+  .calendar-weekday {
+    font-size: 0.72rem;
+  }
+
+  .cal-event {
+    padding: 0.1rem 0.2rem;
+    font-size: 0.58rem;
   }
 }

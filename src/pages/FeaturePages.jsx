@@ -34,9 +34,73 @@ function EmptyState({ text }) {
   return <div className="empty-state">{text}</div>;
 }
 
+const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+// 2026년 6월 달력. 일정은 해당 날짜 칸에 표시합니다.
+function MonthCalendar({ events, year = 2026, month = 6 }) {
+  const monthIndex = month - 1;
+  const firstWeekday = new Date(year, monthIndex, 1).getDay(); // 0=일
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+
+  const today = new Date();
+  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === monthIndex;
+  const todayDate = today.getDate();
+
+  const prefix = `${year}-${String(month).padStart(2, '0')}`;
+  const eventsByDay = {};
+  events
+    .filter((event) => event.date.startsWith(prefix))
+    .forEach((event) => {
+      const day = Number(event.date.slice(8, 10));
+      (eventsByDay[day] = eventsByDay[day] || []).push(event);
+    });
+
+  const cells = [];
+  for (let i = 0; i < firstWeekday; i += 1) cells.push(null);
+  for (let day = 1; day <= daysInMonth; day += 1) cells.push(day);
+
+  return (
+    <div className="calendar">
+      <div className="calendar-title">{year}년 {month}월</div>
+      <div className="calendar-grid">
+        {WEEKDAYS.map((name, index) => (
+          <div
+            key={name}
+            className={`calendar-weekday${index === 0 ? ' sun' : ''}${index === 6 ? ' sat' : ''}`}
+          >
+            {name}
+          </div>
+        ))}
+
+        {cells.map((day, index) => {
+          if (day === null) return <div key={`empty-${index}`} className="calendar-day empty" />;
+
+          const weekday = (firstWeekday + day - 1) % 7;
+          const classes = ['calendar-day'];
+          if (isCurrentMonth && day === todayDate) classes.push('today');
+          if (weekday === 0) classes.push('sun');
+          if (weekday === 6) classes.push('sat');
+
+          return (
+            <div key={day} className={classes.join(' ')}>
+              <span className="day-num">{day}</span>
+              {(eventsByDay[day] || []).map((event) => (
+                <span key={event.id} className="cal-event" title={event.title}>{event.title}</span>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function CalendarPage() {
   return (
     <PageShell title="달력 / 스케줄표" description="학교 주요 일정, 시험, 부서 일정을 한눈에 확인합니다.">
+      <MonthCalendar events={academicEvents} year={2026} month={6} />
+
+      <h3 className="subhead">일정 목록</h3>
       <div className="timeline">
         {academicEvents.map((event) => (
           <article key={event.id} className="timeline-item">
