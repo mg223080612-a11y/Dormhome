@@ -62,7 +62,6 @@ export default function Layout({
               <h1>{pageTitle}</h1>
               <p>{dept.description}</p>
             </div>
-            <div className="dept-mark" aria-hidden="true">{dept.shortLabel}</div>
           </section>
 
           {children}
