@@ -197,7 +197,8 @@ button.stat-card:hover {
   width: 2.8rem;
   height: 2.8rem;
   border-radius: var(--radius-sm);
-  background: var(--dept-soft);
+  background: #ffffff;
+  border: 1px solid var(--line);
   font-size: 1.5rem;
 }
 
@@ -208,11 +209,11 @@ button.stat-card:hover {
 
 .bookmark-text strong {
   font-size: 1rem;
-  color: var(--ink);
+  color: #111111;
 }
 
 .bookmark-text small {
-  color: var(--ink-soft);
+  color: #4b5563;
 }
 
 /* 최근 사진 (mock 이미지 = 부서색 그라데이션 카드) */
@@ -564,7 +565,8 @@ button.stat-card:hover {
   padding: 1.1rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: var(--surface);
+  /* 연한 부서색 배경으로 흰 페이지에서도 눈에 잘 들어오게 */
+  background: var(--dept-soft);
   box-shadow: var(--shadow-sm);
   text-align: left;
   color: var(--ink);
@@ -589,8 +591,12 @@ button.stat-card:hover {
   margin: 0.3rem 0;
 }
 
+.media-card h3 {
+  color: #111111;
+}
+
 .media-card p {
-  color: var(--ink-soft);
+  color: #4b5563;
 }
 
 /* 빈 상태 */
