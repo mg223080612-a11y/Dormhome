@@ -1,18 +1,19 @@
+// MG 번호 기반 mock 로그인.
+// 실제 배포 시에는 Firebase/Supabase 같은 백엔드 인증으로 교체하세요.
 const SESSION_KEY = 'gvcs-session';
 
-export const validateLogin = ({ studentId, password }) => {
-  const id = String(studentId || '').trim();
-  if (id.length < 4) return '학번을 4자리 이상 입력해 주세요.';
-  if (!/^[a-zA-Z0-9-]+$/.test(id)) return '학번은 영문, 숫자, 하이픈만 사용할 수 있습니다.';
-  if (!String(password || '')) return '비밀번호를 입력해 주세요.';
+export const validateLogin = ({ mgNumber }) => {
+  const mg = String(mgNumber || '').trim();
+  if (!mg) return 'MG 번호를 입력해 주세요.';
+  if (!/^[0-9]{4,6}$/.test(mg)) return 'MG 번호는 숫자 4~6자리로 입력해 주세요.';
   return '';
 };
 
-export const createSession = ({ studentId }) => {
-  const safeId = String(studentId || '').trim();
+export const createSession = ({ mgNumber }) => {
+  const mg = String(mgNumber || '').trim();
   const session = {
-    studentId: safeId,
-    name: safeId,
+    mgNumber: mg,
+    name: `MG ${mg}`,
     loginAt: new Date().toISOString()
   };
 

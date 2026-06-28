@@ -23,10 +23,9 @@ export default function Layout({
       className="app-shell"
       style={{
         '--dept-color': dept.color,
+        '--dept-ink': dept.ink,
         '--dept-soft': dept.soft,
-        '--dept-text': dept.text,
-        '--dept-card': dept.card,
-        '--dept-line': dept.line
+        '--dept-text': dept.text
       }}
     >
       <header className="top-bar">
@@ -45,11 +44,11 @@ export default function Layout({
         <div className="user-pill">
           {session ? (
             <>
-              <span>{session.name}</span>
+              <span className="account-chip">{session.name}</span>
               <button type="button" onClick={onLogout}>로그아웃</button>
             </>
           ) : (
-            <button type="button" onClick={onLoginClick}>로그인</button>
+            <button type="button" className="login-trigger" onClick={onLoginClick}>로그인</button>
           )}
         </div>
       </header>

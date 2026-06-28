@@ -1,14 +1,14 @@
+/* ============================================================
+   layout.css — 앱 셸 / 상단바 / 사이드바 / 페이지 히어로
+   ============================================================ */
+
 .app-shell {
   min-height: 100vh;
   padding: 1.5rem;
-  background:
-    radial-gradient(1100px 520px at 50% -8%, var(--dept-soft), transparent 68%),
-    radial-gradient(800px 400px at 100% 0%, var(--dept-soft), transparent 60%),
-    #f6f7f9;
-  transition: background 0.5s var(--ease);
+  background: var(--bg);
 }
 
-/* ───────────────────────── Top bar (GMB / black) ───────────────────────── */
+/* ── 상단바 (검정 바 + 우측 로그인) ───────────────────────── */
 .top-bar {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -17,29 +17,24 @@
   position: sticky;
   top: 1rem;
   z-index: 20;
-  margin: 0 auto 2rem;
   max-width: 1320px;
+  margin: 0 auto 2rem;
   padding: 0.6rem 0.8rem;
-  background: linear-gradient(135deg, #232326 0%, #050505 60%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #111111;
   border-radius: 999px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
-  backdrop-filter: saturate(140%);
+  box-shadow: var(--shadow-md);
 }
 
 .brand-pill {
-  display: grid;
-  place-items: center;
-  min-height: 3.2rem;
-  padding: 0 1.4rem;
+  min-height: 3rem;
+  padding: 0 1.3rem;
   border: 0;
   border-radius: 999px;
   background: transparent;
   color: #ffffff;
-  font-weight: 900;
-  font-size: 1.25rem;
-  letter-spacing: -0.04em;
-  transition: opacity 0.2s var(--ease);
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: -0.03em;
 }
 
 .brand-pill:hover {
@@ -48,79 +43,75 @@
 
 .top-menu-pill {
   display: flex;
-  align-items: center;
   justify-content: flex-end;
-  background: transparent;
 }
 
 .dept-switcher {
   display: flex;
-  gap: 0.4rem;
   flex-wrap: wrap;
+  gap: 0.4rem;
   justify-content: flex-end;
 }
 
+/* 부서 탭: 선택 시에만 부서색을 채움(포인트 사용) */
 .dept-chip {
   border: 0;
   border-radius: 999px;
-  padding: 0.55rem 0.95rem;
+  padding: 0.5rem 0.95rem;
   background: transparent;
-  color: rgba(255, 255, 255, 0.72);
-  font-weight: 800;
-  font-size: 0.92rem;
-  transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
 }
 
 .dept-chip:hover {
-  background: var(--chip-bg);
-  color: var(--chip-text);
-  transform: translateY(-1px);
+  color: #ffffff;
 }
 
 .dept-chip.active {
   background: var(--chip-bg);
   color: var(--chip-text);
-  box-shadow: 0 6px 18px -6px var(--chip-bg);
 }
 
+/* ── 우측 사용자 영역 (로그인 / 계정) ─────────────────────── */
 .user-pill {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  min-height: 3.2rem;
-  padding: 0 0.6rem 0 1.1rem;
-  background: transparent;
+  padding-right: 0.4rem;
   color: #ffffff;
 }
 
-.user-pill span {
+.account-chip {
   font-weight: 800;
-}
-
-.user-pill small {
-  color: rgba(255, 255, 255, 0.6);
-  white-space: nowrap;
+  font-size: 0.95rem;
 }
 
 .user-pill button {
   border: 0;
   border-radius: 999px;
-  padding: 0.5rem 0.85rem;
-  background: rgba(255, 255, 255, 0.12);
+  padding: 0.55rem 1rem;
+  background: rgba(255, 255, 255, 0.14);
   color: #ffffff;
-  font-size: 0.86rem;
-  font-weight: 800;
+  font-size: 0.88rem;
+  font-weight: 700;
   transition: background 0.2s var(--ease);
 }
 
 .user-pill button:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.28);
 }
 
-/* ───────────────────────── Main layout ───────────────────────── */
+.login-trigger {
+  background: #ffffff !important;
+  color: #111111 !important;
+}
+
+/* ── 본문 그리드 (사이드바 + 콘텐츠) ──────────────────────── */
 .main-grid {
   display: grid;
-  grid-template-columns: 16rem minmax(0, 1fr);
+  grid-template-columns: 15rem minmax(0, 1fr);
   gap: 1.5rem;
   max-width: 1320px;
   margin: 0 auto;
@@ -130,41 +121,36 @@
   align-self: start;
   position: sticky;
   top: 6.5rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: var(--shadow-md);
-  padding: 1.1rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .sidebar-title {
-  display: flex;
-  align-items: center;
-  min-height: 2.6rem;
-  padding: 0 0.6rem;
+  padding: 0.4rem 0.6rem;
   color: var(--ink-soft);
   font-weight: 800;
-  font-size: 0.85rem;
-  letter-spacing: 0.06em;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .side-nav {
   display: grid;
-  gap: 0.2rem;
+  gap: 0.15rem;
   max-height: calc(100vh - 11rem);
   overflow-y: auto;
-  padding-right: 0.15rem;
 }
 
 .side-section-title {
-  margin: 1.1rem 0 0.35rem;
+  margin: 1rem 0 0.3rem;
   padding: 0 0.6rem;
   color: var(--ink-soft);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -173,15 +159,15 @@
   align-items: center;
   gap: 0.6rem;
   width: 100%;
-  min-height: 2.7rem;
+  min-height: 2.6rem;
   border: 0;
   border-radius: var(--radius-sm);
-  padding: 0.6rem 0.75rem;
+  padding: 0.55rem 0.7rem;
   background: transparent;
   color: #52525b;
   text-align: left;
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: 600;
+  font-size: 0.94rem;
   transition: background 0.2s var(--ease), color 0.2s var(--ease);
 }
 
@@ -190,9 +176,10 @@
   color: var(--ink);
 }
 
+/* 활성 메뉴: 옅은 틴트 배경 + 부서색 글자 + 좌측 포인트 라인 */
 .side-item.active {
   background: var(--dept-soft);
-  color: var(--dept-color);
+  color: var(--dept-ink);
   font-weight: 800;
   box-shadow: inset 3px 0 0 var(--dept-color);
 }
@@ -207,36 +194,25 @@
   min-width: 0;
 }
 
-/* ───────────────────────── Page hero ───────────────────────── */
+/* ── 페이지 히어로 (상단 포인트 라인만 부서색) ───────────── */
 .page-hero {
-  position: relative;
-  overflow: hidden;
   display: flex;
   justify-content: space-between;
-  gap: 1.5rem;
   align-items: center;
-  padding: 2rem 2.25rem;
-  border-radius: var(--radius-lg);
-  background:
-    radial-gradient(420px 220px at 100% 0%, var(--dept-soft), transparent 70%),
-    var(--dept-card);
-  border: 1px solid var(--dept-line);
-  box-shadow: var(--shadow-md);
+  gap: 1.5rem;
   margin-bottom: 1.5rem;
-}
-
-.page-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 5px;
-  background: var(--dept-color);
+  padding: 1.75rem 2rem;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--dept-color);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .page-hero h1 {
   margin: 0.3rem 0;
-  font-size: clamp(1.7rem, 3.5vw, 2.6rem);
-  letter-spacing: -0.05em;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  letter-spacing: -0.04em;
   color: var(--ink);
 }
 
@@ -248,28 +224,25 @@
 
 .eyebrow {
   margin: 0;
-  color: var(--dept-color) !important;
+  color: var(--dept-ink);
   font-weight: 800;
   font-size: 0.9rem;
-  letter-spacing: 0.02em;
 }
 
+/* 부서 마크: 가독성을 위해 진한 ink 색 사용 */
 .dept-mark {
   display: grid;
   place-items: center;
-  min-width: 5.25rem;
-  height: 5.25rem;
+  min-width: 5rem;
+  height: 5rem;
   border-radius: var(--radius-md);
-  background: var(--dept-color);
-  background: linear-gradient(145deg, var(--dept-color), color-mix(in srgb, var(--dept-color) 60%, #000));
-  color: var(--dept-text);
-  font-weight: 900;
-  font-size: 1.1rem;
-  letter-spacing: -0.02em;
-  box-shadow: 0 14px 30px -10px var(--dept-color);
+  background: var(--dept-ink);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.05rem;
 }
 
-/* ───────────────────────── Responsive ───────────────────────── */
+/* ── 반응형 ─────────────────────────────────────────────── */
 @media (max-width: 1080px) {
   .main-grid {
     grid-template-columns: 1fr;
@@ -280,14 +253,14 @@
   }
 
   .side-nav {
+    flex-flow: row wrap;
     display: flex;
-    flex-wrap: wrap;
     overflow-x: auto;
     max-height: none;
   }
 
-  .side-section-title,
-  .sidebar-title {
+  .sidebar-title,
+  .side-section-title {
     width: 100%;
   }
 
@@ -319,8 +292,9 @@
   }
 
   .page-hero {
-    padding: 1.25rem;
+    flex-direction: column;
     align-items: flex-start;
+    padding: 1.25rem;
   }
 
   .dept-mark {

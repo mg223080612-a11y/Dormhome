@@ -1,3 +1,22 @@
+// 메인 대시보드 - 공지사항 (important: true 면 "중요" 배지 표시)
+export const notices = [
+  { id: 1, title: '6월 급식 만족도 조사 안내', dept: '학생회', date: '2026-06-26', important: true },
+  { id: 2, title: 'Global Culture Day 자원봉사 모집', dept: '홍보대사', date: '2026-06-24', important: true },
+  { id: 3, title: '생활관 대청소 일정 변경 (6/5 → 6/7)', dept: '자치위원', date: '2026-06-22', important: false },
+  { id: 4, title: '상점·벌점 기준 카드뉴스 게시', dept: '자치법정', date: '2026-06-20', important: false },
+  { id: 5, title: 'GMB 숏폼 업로드 마감 D-3', dept: 'GMB', date: '2026-06-18', important: false }
+];
+
+// 메인 대시보드 - 최근 사진 (dept 는 부서 id, 카드 색상 그라데이션에 사용)
+export const galleryPhotos = [
+  { id: 1, title: '학생회 정기 회의', dept: 'studentCouncil', tag: '학생회' },
+  { id: 2, title: '생활관 이벤트 나이트', dept: 'autonomyCommittee', tag: '자치위원' },
+  { id: 3, title: '홍보대사 캠퍼스 촬영', dept: 'ambassador', tag: '홍보대사' },
+  { id: 4, title: '신문부 취재 현장', dept: 'newspaper', tag: '신문부' },
+  { id: 5, title: 'GMB 브이로그 촬영', dept: 'gmb', tag: 'GMB' },
+  { id: 6, title: '자치법정 모의재판', dept: 'court', tag: '자치법정' }
+];
+
 export const academicEvents = [
   { id: 1, title: '중간고사', date: '2026-04-20', type: 'exam', dept: '학생회' },
   { id: 2, title: '기말고사', date: '2026-06-15', type: 'exam', dept: '학생회' },

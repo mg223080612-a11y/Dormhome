@@ -1,10 +1,23 @@
 import StatCard from '../components/StatCard';
-import { academicEvents, pledges, surveys, weeklyMeals, weeklyVerse } from '../data/mockData';
+import { getDepartment } from '../data/departments';
+import {
+  academicEvents,
+  galleryPhotos,
+  initialTaxiRequests,
+  notices,
+  surveys,
+  weeklyMeals
+} from '../data/mockData';
 
-const average = (items) => {
-  if (!items.length) return 0;
-  return Math.round(items.reduce((sum, item) => sum + item.progress, 0) / items.length);
-};
+// 메인 대시보드에서 잘 보이도록 모아 둔 자주 쓰는 메뉴 (북마크)
+const bookmarks = [
+  { id: 'meal', label: '급식', icon: '🍱', desc: '주간 급식표 보기' },
+  { id: 'taxiMate', label: '택시메이트', icon: '🚕', desc: '함께 탈 친구 찾기' },
+  { id: 'survey', label: '설문조사', icon: '📊', desc: '열린 설문 참여' },
+  { id: 'suggestions', label: '건의함', icon: '📮', desc: '의견 남기기' },
+  { id: 'dormSchedule', label: '생활관 스케줄', icon: '🏫', desc: '하루 일정 확인' },
+  { id: 'market', label: '당근마켓', icon: '🥕', desc: '교내 나눔·거래' }
+];
 
 const pickNextEvent = (events) => {
   const today = new Date();
@@ -12,41 +25,92 @@ const pickNextEvent = (events) => {
   const upcoming = events
     .filter((event) => new Date(`${event.date}T00:00:00`) >= todayOnly)
     .sort((a, b) => new Date(a.date) - new Date(b.date));
-  if (upcoming.length) return upcoming[0];
   // 다가오는 일정이 없으면 가장 최근 일정을 보여 줍니다.
-  return [...events].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  return upcoming[0] || [...events].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 };
+
+function SectionHead({ title, actionLabel, onAction }) {
+  return (
+    <div className="section-head">
+      <h2>{title}</h2>
+      {onAction && (
+        <button type="button" className="text-link" onClick={onAction}>
+          {actionLabel} →
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default function Dashboard({ onNavigate }) {
   const todayMeal = weeklyMeals[0];
   const nextEvent = pickNextEvent(academicEvents);
 
   return (
-    <div className="dashboard-grid">
-      <StatCard label="진행 중 공약" value={`${pledges.length}개`} caption={`평균 이행률 ${average(pledges)}%`} onClick={() => onNavigate('pledges')} />
-      <StatCard label="열린 설문" value={`${surveys.length}개`} caption="버튼형 설문 링크" onClick={() => onNavigate('survey')} />
-      <StatCard label="다음 일정" value={nextEvent.title} caption={nextEvent.date} onClick={() => onNavigate('calendar')} />
-      <StatCard label="오늘 급식" value={todayMeal.lunch} caption="월요일 점심 기준" onClick={() => onNavigate('meal')} />
-
-      <section className="wide-card">
-        <div className="wide-card-title">
-          <span>이번 주 말씀</span>
-          <button type="button" onClick={() => onNavigate('verse')}>자세히</button>
+    <div className="dashboard">
+      {/* 오늘의 요약 */}
+      <section className="section">
+        <SectionHead title="오늘의 요약" />
+        <div className="summary-grid">
+          <StatCard label="오늘 일정" value={nextEvent.title} caption={nextEvent.date} onClick={() => onNavigate('calendar')} />
+          <StatCard label="오늘 급식" value={todayMeal.lunch} caption="점심 기준" onClick={() => onNavigate('meal')} />
+          <StatCard label="진행 중 설문" value={`${surveys.length}개`} caption="버튼형 설문 링크" onClick={() => onNavigate('survey')} />
+          <StatCard label="택시메이트" value={`${initialTaxiRequests.length}건`} caption="모집 중" onClick={() => onNavigate('taxiMate')} />
         </div>
-        <h2>{weeklyVerse.reference}</h2>
-        <p>{weeklyVerse.text}</p>
-        <small>{weeklyVerse.memo}</small>
       </section>
 
-      <section className="wide-card muted">
-        <div className="wide-card-title">
-          <span>홈 UI 방향</span>
-          <button type="button" onClick={() => onNavigate('suggestions')}>건의하기</button>
+      {/* 북마크 */}
+      <section className="section">
+        <SectionHead title="북마크" />
+        <div className="bookmark-grid">
+          {bookmarks.map((item) => (
+            <button key={item.id} type="button" className="bookmark-card" onClick={() => onNavigate(item.id)}>
+              <span className="bookmark-icon">{item.icon}</span>
+              <span className="bookmark-text">
+                <strong>{item.label}</strong>
+                <small>{item.desc}</small>
+              </span>
+            </button>
+          ))}
         </div>
-        <p>
-          상단에는 자치부서 전환, 좌측에는 세부 기능, 중앙에는 학교생활에 필요한 정보를 카드형으로 배치합니다.
-          자치위원은 버건디, 홍보대사는 핑크, 신문부는 아이보리, 자치법정은 청록, GMB는 검정 계열로 구분합니다.
-        </p>
+      </section>
+
+      {/* 최근 사진 */}
+      <section className="section">
+        <SectionHead title="최근 사진" actionLabel="사진첩 전체보기" onAction={() => onNavigate('shortform')} />
+        <div className="gallery-grid">
+          {galleryPhotos.map((photo) => (
+            <article
+              key={photo.id}
+              className="photo-card"
+              style={{ '--photo': getDepartment(photo.dept).ink }}
+            >
+              <div className="photo-thumb">
+                <span className="photo-tag">{photo.tag}</span>
+              </div>
+              <h3 className="photo-title">{photo.title}</h3>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* 공지사항 */}
+      <section className="section">
+        <SectionHead title="공지사항" actionLabel="달력에서 보기" onAction={() => onNavigate('calendar')} />
+        <div className="notice-list">
+          {notices.map((notice) => (
+            <article key={notice.id} className="notice-item">
+              <div className="notice-main">
+                {notice.important && <span className="badge badge-alert">중요</span>}
+                <h3>{notice.title}</h3>
+              </div>
+              <div className="notice-meta">
+                <span>{notice.dept}</span>
+                <small>{notice.date}</small>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
     </div>
   );
