@@ -29,7 +29,7 @@ export const departments = [
     soft: '#f7ecec',
     text: '#ffffff',
     description: '생활관 스케줄, 생활관 꿀팁, 수리 요청',
-    focus: ['dormSchedule', 'tips', 'dormRepair', 'birthday', 'cafeteriaWish', 'market']
+    focus: ['dormSchedule', 'tips', 'dormRepair', 'birthday', 'cafeteriaWish', 'market', 'shortform']
   },
   {
     id: 'newspaper',
@@ -64,7 +64,7 @@ export const departments = [
     soft: '#fdf2f8',
     text: '#831843',
     description: '사진첩, 홍보 콘텐츠, 학교 브랜딩',
-    focus: ['shortform']
+    focus: []
   },
   {
     id: 'gmb',
@@ -75,7 +75,7 @@ export const departments = [
     soft: '#ededed',
     text: '#ffffff',
     description: '영상, 숏폼, 방송 콘텐츠',
-    focus: ['shortform']
+    focus: []
   }
 ];
 

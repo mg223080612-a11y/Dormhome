@@ -11,7 +11,7 @@
 /* ── 상단바 (검정 바 + 우측 로그인) ───────────────────────── */
 .top-bar {
   display: grid;
-  grid-template-columns: minmax(18rem, 22rem) minmax(0, 1fr) auto;
+  grid-template-columns: 22rem minmax(0, 1fr) auto;
   gap: 1rem;
   align-items: center;
   position: sticky;
@@ -61,14 +61,14 @@
   border-radius: var(--radius-sm);
   padding: 0.5rem 0.95rem;
   background: transparent;
-  color: #6b7280;
+  color: var(--chip-ink);
   font-weight: 700;
   font-size: 0.9rem;
   transition: background 0.2s var(--ease), color 0.2s var(--ease);
 }
 
 .dept-chip:hover {
-  color: #111111;
+  color: var(--chip-ink);
 }
 
 .dept-chip.active {
