@@ -14,8 +14,8 @@ export const departments = [
     label: '학생회',
     shortLabel: '학생회',
     color: 'var(--student-council)',
-    ink: '#1d4ed8',
-    soft: '#eff4ff',
+    ink: '#172554',
+    soft: '#eff6ff',
     text: '#ffffff',
     description: '전체 공지, 공약 이행도, 스케줄 관리',
     focus: ['pledges', 'calendar', 'survey', 'suggestions']
@@ -48,8 +48,8 @@ export const departments = [
     label: '자치법정',
     shortLabel: '자법',
     color: 'var(--court)',
-    ink: '#5f6b3f',
-    soft: '#f1f3ea',
+    ink: '#14532d',
+    soft: '#ecfdf5',
     text: '#ffffff',
     description: '상점·벌점 안내, 규정 안내, 질의응답',
     focus: ['points', 'suggestions']
@@ -60,9 +60,9 @@ export const departments = [
     shortLabel: '홍대',
     // 베이비 핑크: 밝은 색이라 글자는 진한 로즈(text)로 대비를 줍니다
     color: 'var(--ambassador)',
-    ink: '#c2476b',
-    soft: '#fdeef3',
-    text: '#6d213c',
+    ink: '#be185d',
+    soft: '#fdf2f8',
+    text: '#831843',
     description: '사진첩, 홍보 콘텐츠, 학교 브랜딩',
     focus: ['shortform']
   },

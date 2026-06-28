@@ -11,7 +11,7 @@
 /* ── 상단바 (검정 바 + 우측 로그인) ───────────────────────── */
 .top-bar {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(18rem, 22rem) minmax(0, 1fr) auto;
   gap: 1rem;
   align-items: center;
   position: sticky;
@@ -44,7 +44,7 @@
 
 .top-menu-pill {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 0;
 }
 
@@ -52,7 +52,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 /* 부서 탭: 선택 시에만 부서색을 채움(포인트 사용) */
