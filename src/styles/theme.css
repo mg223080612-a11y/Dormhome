@@ -5,7 +5,7 @@
 
 :root {
   /* ── 자치부서 팔레트 (단일 소스) ───────────────────────── */
-  --student-council: #2563eb; /* 학생회: 파랑 */
+  --student-council: #3b82f6; /* 학생회: 파랑(연하게) */
   --committee: #7f1d1d;       /* 자치위원: 버건디 */
   --press: #d8d2c4;           /* 신문부: 아이보리 */
   --press-dark: #6b7280;      /* 신문부: 회색 */
@@ -26,10 +26,10 @@
   --dept-soft: #eff4ff;                 /* 옅은 틴트 배경 */
   --dept-text: #ffffff;                 /* 액센트 위 글자색 */
 
-  /* ── 모양 토큰 ─────────────────────────────────────────── */
-  --radius-lg: 1.4rem;
-  --radius-md: 1rem;
-  --radius-sm: 0.7rem;
+  /* ── 모양 토큰 (값을 키우면 더 둥글게, 줄이면 더 네모나게) ── */
+  --radius-lg: 0.75rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.35rem;
   --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.05);
   --shadow-md: 0 10px 28px rgba(17, 24, 39, 0.08);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);

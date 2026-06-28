@@ -27,7 +27,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.4rem 0.9rem;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   background: #111111;
 }
 
@@ -39,7 +39,7 @@
 
 .login-logo-sub {
   padding: 0.1rem 0.5rem;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   background: var(--student-council);
   color: #ffffff;
   font-size: 0.8rem;
