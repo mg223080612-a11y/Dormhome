@@ -577,15 +577,11 @@ button.stat-card:hover {
   border-color: var(--dept-color);
 }
 
-.media-thumb {
-  display: grid;
-  place-items: center;
-  height: 9rem;
-  margin-bottom: 0.85rem;
-  border-radius: var(--radius-sm);
-  background: var(--dept-soft);
-  color: var(--dept-ink);
-  font-size: 3rem;
+.media-icon {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  line-height: 1;
 }
 
 .media-card h3,

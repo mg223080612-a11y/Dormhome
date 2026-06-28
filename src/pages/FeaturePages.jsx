@@ -414,7 +414,7 @@ export function ShortformPage() {
       <div className="media-grid">
         {shortforms.map((item) => (
           <a key={item.id} href={item.url} target="_blank" rel="noreferrer" className="media-card">
-            <div className="media-thumb">{item.type === 'vsco' ? '📷' : '▶'}</div>
+            <span className="media-icon">{item.type === 'vsco' ? '📷' : '▶'}</span>
             <h3>{item.title}</h3>
             <p>{item.owner} · {item.type}</p>
           </a>

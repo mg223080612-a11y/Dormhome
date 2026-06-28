@@ -23,7 +23,7 @@ export default function DepartmentPage({ department, onNavigate }) {
               className="media-card"
               onClick={() => onNavigate(item.id)}
             >
-              <div className="media-thumb">{item.icon}</div>
+              <span className="media-icon">{item.icon}</span>
               <h3>{item.label}</h3>
               <p>{dept.label} 담당 기능</p>
             </button>
