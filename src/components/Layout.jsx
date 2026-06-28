@@ -75,7 +75,7 @@ export default function Layout({
         aria-expanded={menuOpen}
         onClick={() => setMenuOpen((open) => !open)}
       >
-        ··· {menuOpen ? '메뉴 닫기' : '더보기'}
+        {menuOpen ? '✕' : '···'}
       </button>
 
       <div className="main-grid">

@@ -665,6 +665,15 @@ button.stat-card:hover {
   border-color: var(--dept-color);
 }
 
+.page-card .media-card {
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.page-card .media-card:hover {
+  filter: none;
+}
+
 .media-icon {
   display: block;
   margin-bottom: 0.5rem;
