@@ -208,6 +208,32 @@
   min-width: 0;
 }
 
+.site-credit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  max-width: 1320px;
+  margin: 2.5rem auto 0;
+  padding: 1.25rem 1rem;
+  border-top: 1px solid var(--line);
+  color: #6b7280;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.site-credit strong {
+  color: #4b5563;
+  font-weight: 800;
+}
+
+.sync-mark {
+  width: 1.55rem;
+  height: 1.55rem;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
 /* 메뉴 토글 버튼 (넓은 화면에서는 숨김) */
 .menu-toggle {
   display: none;

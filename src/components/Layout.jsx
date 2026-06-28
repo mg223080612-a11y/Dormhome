@@ -70,6 +70,13 @@ export default function Layout({
           {children}
         </main>
       </div>
+
+      <footer className="site-credit">
+        <img src="/sync-mark.png" alt="" className="sync-mark" aria-hidden="true" />
+        <span>
+          made by <strong>GVCS MG coding club Sync</strong>
+        </span>
+      </footer>
     </div>
   );
 }
