@@ -41,6 +41,7 @@ export default function Layout({
     >
       <header className="top-bar">
         <button className="brand-pill" type="button" onClick={() => navigateAndClose('home')}>
+          <img src="/favicon.png" alt="" className="brand-mark" aria-hidden="true" />
           GVCS
         </button>
 
