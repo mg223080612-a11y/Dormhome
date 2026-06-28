@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import DepartmentSwitcher from './DepartmentSwitcher';
 import Sidebar from './Sidebar';
-import { getDepartment } from '../data/departments';
 
 export default function Layout({
   session,
@@ -13,8 +12,6 @@ export default function Layout({
   onLoginClick,
   children
 }) {
-  const dept = getDepartment(selectedDepartment);
-
   // 좁은 화면에서 사이드바 펼침 여부
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -30,15 +27,7 @@ export default function Layout({
   };
 
   return (
-    <div
-      className="app-shell"
-      style={{
-        '--dept-color': dept.color,
-        '--dept-ink': dept.ink,
-        '--dept-soft': dept.soft,
-        '--dept-text': dept.text
-      }}
-    >
+    <div className="app-shell">
       <header className="top-bar">
         <button className="brand-pill" type="button" onClick={() => navigateAndClose('home')}>
           <img src="/favicon.png" alt="" className="brand-mark" aria-hidden="true" />

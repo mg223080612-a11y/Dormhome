@@ -11,7 +11,7 @@
 /* ── 상단바 (검정 바 + 우측 로그인) ───────────────────────── */
 .top-bar {
   display: grid;
-  grid-template-columns: 22rem minmax(0, 1fr) auto;
+  grid-template-columns: 16.5rem minmax(0, 1fr) auto;
   gap: 1rem;
   align-items: center;
   position: sticky;

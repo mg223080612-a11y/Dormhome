@@ -8,7 +8,15 @@ export default function DepartmentPage({ department, onNavigate }) {
     .filter(Boolean);
 
   return (
-    <section className="page-card department-page">
+    <section
+      className="page-card department-page"
+      style={{
+        '--dept-color': dept.color,
+        '--dept-ink': dept.ink,
+        '--dept-soft': dept.soft,
+        '--dept-text': dept.text
+      }}
+    >
       <div className="page-card-head">
         <h2>{dept.label}</h2>
         <p>{dept.description}</p>
