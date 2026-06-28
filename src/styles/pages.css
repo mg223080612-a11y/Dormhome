@@ -5,8 +5,7 @@
    ============================================================ */
 
 /* ── 카드 공통 ─────────────────────────────────────────────
-   .card-surface : 흰 배경 + 테두리 + 상단 부서색 포인트 라인 */
-.card-surface,
+   흰 배경 + 테두리 + 상단 부서색 포인트 라인 */
 .page-card,
 .stat-card,
 .simple-card,
@@ -23,7 +22,6 @@
 }
 
 /* ── 공통 버튼 (부서색 채움) ───────────────────────────────── */
-.btn-primary,
 .link-button,
 .inline-form button,
 .stack-form button,
@@ -38,7 +36,6 @@
   transition: transform 0.2s var(--ease), filter 0.2s var(--ease);
 }
 
-.btn-primary:hover,
 .link-button:hover,
 .inline-form button:hover,
 .stack-form button:hover,

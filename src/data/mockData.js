@@ -112,6 +112,6 @@ export const initialMarketItems = [
 ];
 
 export const initialTaxiRequests = [
-  { id: 1, gender: 'female', date: '2026-06-28', time: '15:30', destination: '문경역', max: 4, memo: '캐리어 1개 가능', author: '12학년' },
-  { id: 2, gender: 'male', date: '2026-06-28', time: '16:00', destination: '점촌터미널', max: 3, memo: '시간 맞으면 같이 이동', author: '11학년' }
+  { id: 1, date: '2026-06-28', time: '15:30', destination: '문경역', max: 4, memo: '캐리어 1개 가능', author: '12학년' },
+  { id: 2, date: '2026-06-28', time: '16:00', destination: '점촌터미널', max: 3, memo: '시간 맞으면 같이 이동', author: '11학년' }
 ];

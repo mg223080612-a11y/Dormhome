@@ -275,41 +275,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* ── 페이지 히어로 (상단 포인트 라인만 부서색) ───────────── */
-.page-hero {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding: 1.75rem 2rem;
-  border: 1px solid var(--line);
-  border-top: 3px solid var(--dept-color);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-}
-
-.page-hero h1 {
-  margin: 0.3rem 0;
-  font-size: clamp(1.6rem, 3vw, 2.3rem);
-  letter-spacing: -0.04em;
-  color: var(--ink);
-}
-
-.page-hero p {
-  margin: 0;
-  color: var(--ink-soft);
-  line-height: 1.55;
-}
-
-.eyebrow {
-  margin: 0;
-  color: var(--dept-ink);
-  font-weight: 800;
-  font-size: 0.9rem;
-}
-
 /* ── 반응형 ─────────────────────────────────────────────── */
 @media (max-width: 1080px) {
   .main-grid {
@@ -363,11 +328,5 @@
 @media (max-width: 720px) {
   .app-shell {
     padding: 0.85rem;
-  }
-
-  .page-hero {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1.25rem;
   }
 }

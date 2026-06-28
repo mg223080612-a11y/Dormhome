@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import PageShell from '../components/PageShell';
 import {
   academicEvents,
@@ -531,8 +531,4 @@ export function NotFoundPage({ onNavigate }) {
       <button type="button" onClick={() => onNavigate('home')}>홈으로 이동</button>
     </PageShell>
   );
-}
-
-export function useCurrentMonthEvents() {
-  return useMemo(() => academicEvents, []);
 }

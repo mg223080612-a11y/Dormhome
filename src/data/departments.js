@@ -12,7 +12,6 @@ export const departments = [
   {
     id: 'studentCouncil',
     label: '학생회',
-    shortLabel: '학생회',
     color: 'var(--student-council)',
     ink: '#172554',
     soft: '#eff6ff',
@@ -23,7 +22,6 @@ export const departments = [
   {
     id: 'autonomyCommittee',
     label: '자치위원',
-    shortLabel: '자치위',
     color: 'var(--committee)',
     ink: '#7f1d1d',
     soft: '#f7ecec',
@@ -34,7 +32,6 @@ export const departments = [
   {
     id: 'newspaper',
     label: '신문부',
-    shortLabel: '신문부',
     // 아이보리/회색: 옅은 아이보리는 배경 틴트, 회색은 액센트로 사용
     color: 'var(--press-dark)',
     ink: '#4b5563',
@@ -46,7 +43,6 @@ export const departments = [
   {
     id: 'court',
     label: '자치법정',
-    shortLabel: '자법',
     color: 'var(--court)',
     ink: '#14532d',
     soft: '#ecfdf5',
@@ -57,7 +53,6 @@ export const departments = [
   {
     id: 'ambassador',
     label: '홍보대사',
-    shortLabel: '홍대',
     // 베이비 핑크: 밝은 색이라 글자는 진한 로즈(text)로 대비를 줍니다
     color: 'var(--ambassador)',
     ink: '#be185d',
@@ -69,7 +64,6 @@ export const departments = [
   {
     id: 'gmb',
     label: 'GMB',
-    shortLabel: 'GMB',
     color: 'var(--gmb)',
     ink: '#111111',
     soft: '#ededed',
