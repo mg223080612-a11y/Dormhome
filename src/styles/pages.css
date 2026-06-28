@@ -565,8 +565,7 @@ button.stat-card:hover {
   padding: 1.1rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  /* 연한 부서색 배경으로 흰 페이지에서도 눈에 잘 들어오게 */
-  background: var(--dept-soft);
+  background: #ffffff;
   box-shadow: var(--shadow-sm);
   text-align: left;
   color: var(--ink);
