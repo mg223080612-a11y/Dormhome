@@ -22,7 +22,8 @@ export const academicEvents = [
   { id: 2, title: '기말고사', date: '2026-06-19', type: 'exam', dept: '학생회' },
   { id: 3, title: '기말고사', date: '2026-06-22', type: 'exam', dept: '학생회' },
   { id: 4, title: '학생회 공청회', date: '2026-06-25', type: 'hearing', dept: '학생회' },
-  { id: 5, title: '자치위원 공청회', date: '2026-06-29', type: 'hearing', dept: '자치위원' }
+  { id: 5, title: '자치위원 공청회', date: '2026-06-29', type: 'hearing', dept: '자치위원' },
+  { id: 6, title: '방학식', date: '2026-07-04', type: 'event', dept: '학생회' }
 ];
 
 export const pledges = [
