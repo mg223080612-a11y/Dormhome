@@ -399,8 +399,34 @@ button.stat-card:hover {
 }
 
 /* 달력 (월 그리드) */
-.calendar-title {
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   margin-bottom: 0.8rem;
+}
+
+.calendar-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--line, #e2e2e2);
+  border-radius: 0.6rem;
+  background: var(--surface, #fff);
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.calendar-nav-btn:hover {
+  background: var(--hover, #f2f2f2);
+}
+
+.calendar-title {
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.02em;

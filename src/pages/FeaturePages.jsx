@@ -36,17 +36,27 @@ function EmptyState({ text }) {
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
-// 2026년 6월 달력. 일정은 해당 날짜 칸에 표시합니다.
+// 월 단위 달력. 일정은 해당 날짜 칸에 표시하며, 이전/다음 버튼으로 연·월을 이동할 수 있습니다.
 function MonthCalendar({ events, year = 2026, month = 6 }) {
-  const monthIndex = month - 1;
-  const firstWeekday = new Date(year, monthIndex, 1).getDay(); // 0=일
-  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const [view, setView] = useState({ year, month });
+  const goMonth = (delta) => {
+    setView((prev) => {
+      const next = prev.month + delta;
+      if (next < 1) return { year: prev.year - 1, month: 12 };
+      if (next > 12) return { year: prev.year + 1, month: 1 };
+      return { year: prev.year, month: next };
+    });
+  };
+
+  const monthIndex = view.month - 1;
+  const firstWeekday = new Date(view.year, monthIndex, 1).getDay(); // 0=일
+  const daysInMonth = new Date(view.year, monthIndex + 1, 0).getDate();
 
   const today = new Date();
-  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === monthIndex;
+  const isCurrentMonth = today.getFullYear() === view.year && today.getMonth() === monthIndex;
   const todayDate = today.getDate();
 
-  const prefix = `${year}-${String(month).padStart(2, '0')}`;
+  const prefix = `${view.year}-${String(view.month).padStart(2, '0')}`;
   const eventsByDay = {};
   events
     .filter((event) => event.date.startsWith(prefix))
@@ -61,7 +71,11 @@ function MonthCalendar({ events, year = 2026, month = 6 }) {
 
   return (
     <div className="calendar">
-      <div className="calendar-title">{year}년 {month}월</div>
+      <div className="calendar-nav">
+        <button type="button" className="calendar-nav-btn" onClick={() => goMonth(-1)} aria-label="이전 달">‹</button>
+        <div className="calendar-title">{view.year}년 {view.month}월</div>
+        <button type="button" className="calendar-nav-btn" onClick={() => goMonth(1)} aria-label="다음 달">›</button>
+      </div>
       <div className="calendar-grid">
         {WEEKDAYS.map((name, index) => (
           <div

@@ -18,11 +18,11 @@ export const galleryPhotos = [
 ];
 
 export const academicEvents = [
-  { id: 1, title: '중간고사', date: '2026-04-20', type: 'exam', dept: '학생회' },
-  { id: 2, title: '기말고사', date: '2026-06-15', type: 'exam', dept: '학생회' },
-  { id: 3, title: 'Global Culture Day', date: '2026-05-29', type: 'event', dept: '홍보대사' },
-  { id: 4, title: '생활관 대청소', date: '2026-06-05', type: 'dorm', dept: '자치위원' },
-  { id: 5, title: 'GMB 숏폼 업로드 마감', date: '2026-06-10', type: 'media', dept: 'GMB' }
+  { id: 1, title: '기말고사', date: '2026-06-18', type: 'exam', dept: '학생회' },
+  { id: 2, title: '기말고사', date: '2026-06-19', type: 'exam', dept: '학생회' },
+  { id: 3, title: '기말고사', date: '2026-06-22', type: 'exam', dept: '학생회' },
+  { id: 4, title: '학생회 공청회', date: '2026-06-25', type: 'hearing', dept: '학생회' },
+  { id: 5, title: '자치위원 공청회', date: '2026-06-29', type: 'hearing', dept: '자치위원' }
 ];
 
 export const pledges = [
