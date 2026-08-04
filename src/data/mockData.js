@@ -112,6 +112,28 @@ export const initialMarketItems = [
   { id: 2, title: '깨끗한 파일철 3개', price: '나눔', seller: '익명', status: '예약중' }
 ];
 
+// 이벤트 - 선착순 신청형 (숏폼 콘테스트, 휴지 쟁탈전 등)
+export const events = [
+  {
+    id: 1,
+    title: '숏폼 콘테스트',
+    description: 'GVCS 생활을 담은 15초 숏폼을 찍어 제출하세요. 우수작은 학교 SNS에 게시됩니다.',
+    tag: 'GMB',
+    capacity: 30,
+    applied: 18,
+    deadline: '2026-07-11'
+  },
+  {
+    id: 2,
+    title: '휴지 쟁탈전',
+    description: '생활관 라운지에서 열리는 선착순 미니게임 이벤트. 우승 팀에게 간식이 제공됩니다.',
+    tag: '자치위원',
+    capacity: 20,
+    applied: 12,
+    deadline: '2026-07-08'
+  }
+];
+
 export const initialTaxiRequests = [
   { id: 1, date: '2026-06-28', time: '15:30', destination: '문경역', max: 4, memo: '캐리어 1개 가능', author: '12학년' },
   { id: 2, date: '2026-06-28', time: '16:00', destination: '점촌터미널', max: 3, memo: '시간 맞으면 같이 이동', author: '11학년' }

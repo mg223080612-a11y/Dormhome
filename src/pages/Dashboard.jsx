@@ -1,32 +1,37 @@
-import StatCard from '../components/StatCard';
 import { getDepartment } from '../data/departments';
 import {
-  academicEvents,
+  events,
   galleryPhotos,
-  initialTaxiRequests,
   notices,
+  pledges,
   surveys,
   weeklyMeals
 } from '../data/mockData';
 
-// 메인 대시보드에서 잘 보이도록 모아 둔 자주 쓰는 메뉴 (북마크)
-const bookmarks = [
-  { id: 'meal', label: '급식', icon: '🍱', desc: '주간 급식표 보기' },
-  { id: 'taxiMate', label: '택시메이트', icon: '🚕', desc: '함께 탈 친구 찾기' },
-  { id: 'survey', label: '설문조사', icon: '📊', desc: '열린 설문 참여' },
-  { id: 'suggestions', label: '건의함', icon: '📮', desc: '의견 남기기' },
-  { id: 'dormSchedule', label: '생활관 스케줄', icon: '🏫', desc: '하루 일정 확인' },
-  { id: 'market', label: '당근마켓', icon: '🥕', desc: '교내 나눔·거래' }
-];
+const MEAL_PERIOD_LABEL = { breakfast: '아침', lunch: '점심', dinner: '저녁' };
+const WEEKDAY_TO_MEAL_INDEX = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4 }; // 월~금만 급식 제공
 
-const pickNextEvent = (events) => {
+// 현재 시각에 따라 아침/점심/저녁 중 보여줄 급식을 고릅니다.
+const getMealPeriod = () => {
+  const hour = new Date().getHours();
+  if (hour < 10) return 'breakfast';
+  if (hour < 16) return 'lunch';
+  return 'dinner';
+};
+
+const getTodayMeal = () => {
+  const meal = weeklyMeals[WEEKDAY_TO_MEAL_INDEX[new Date().getDay()]];
+  return meal || null;
+};
+
+const pickNextEvent = (list) => {
   const today = new Date();
   const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const upcoming = events
+  const upcoming = list
     .filter((event) => new Date(`${event.date}T00:00:00`) >= todayOnly)
     .sort((a, b) => new Date(a.date) - new Date(b.date));
   // 다가오는 일정이 없으면 가장 최근 일정을 보여 줍니다.
-  return upcoming[0] || [...events].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  return upcoming[0] || [...list].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 };
 
 function SectionHead({ title, actionLabel, onAction }) {
@@ -43,35 +48,60 @@ function SectionHead({ title, actionLabel, onAction }) {
 }
 
 export default function Dashboard({ onNavigate }) {
-  const todayMeal = weeklyMeals[0];
-  const nextEvent = pickNextEvent(academicEvents);
+  const mealPeriod = getMealPeriod();
+  const todayMeal = getTodayMeal();
+  const mealText = todayMeal ? todayMeal[mealPeriod] : '주말에는 급식 정보가 없어요';
+
+  const latestSurvey = surveys[0];
+  const avgPledgeProgress = Math.round(
+    pledges.reduce((sum, pledge) => sum + pledge.progress, 0) / pledges.length
+  );
+  const upcomingEvent = pickNextEvent(events.map((event) => ({ ...event, date: event.deadline })));
 
   return (
     <div className="dashboard">
-      {/* 오늘의 요약 */}
+      {/* 홈 주요 기능 */}
       <section className="section">
-        <SectionHead title="오늘의 요약" />
-        <div className="summary-grid">
-          <StatCard label="오늘 일정" value={nextEvent.title} caption={nextEvent.date} onClick={() => onNavigate('calendar')} />
-          <StatCard label="오늘 급식" value={todayMeal.lunch} caption="점심 기준" onClick={() => onNavigate('meal')} />
-          <StatCard label="진행 중 설문" value={`${surveys.length}개`} caption="버튼형 설문 링크" onClick={() => onNavigate('survey')} />
-          <StatCard label="택시메이트" value={`${initialTaxiRequests.length}건`} caption="모집 중" onClick={() => onNavigate('taxiMate')} />
-        </div>
-      </section>
+        <SectionHead title="홈 주요 기능" />
+        <div className="feature-grid">
+          <button type="button" className="feature-card" onClick={() => onNavigate('meal')}>
+            <span className="feature-label">오늘의 급식 · {MEAL_PERIOD_LABEL[mealPeriod]}</span>
+            <strong className="feature-value">{mealText}</strong>
+          </button>
 
-      {/* 북마크 */}
-      <section className="section">
-        <SectionHead title="북마크" />
-        <div className="bookmark-grid">
-          {bookmarks.map((item) => (
-            <button key={item.id} type="button" className="bookmark-card" onClick={() => onNavigate(item.id)}>
-              <span className="bookmark-icon">{item.icon}</span>
-              <span className="bookmark-text">
-                <strong>{item.label}</strong>
-                <small>{item.desc}</small>
-              </span>
-            </button>
-          ))}
+          <article className="feature-card feature-survey">
+            <span className="feature-label">최근 올라온 설문</span>
+            <strong className="feature-value">{latestSurvey.title}</strong>
+            <small className="feature-caption">마감 {latestSurvey.due} · {latestSurvey.owner}</small>
+            <div className="feature-actions">
+              <a href={latestSurvey.url} target="_blank" rel="noreferrer" className="link-button">구글폼 바로가기</a>
+              <button type="button" className="ghost-button" onClick={() => onNavigate('survey')}>설문조사 탭</button>
+            </div>
+          </article>
+
+          <button type="button" className="feature-card" onClick={() => onNavigate('pledges')}>
+            <span className="feature-label">공약 이행도</span>
+            <div className="pledge-chart">
+              <svg viewBox="0 0 36 36" className="pledge-ring">
+                <path className="pledge-ring-bg" d="M18 2 a16 16 0 1 1 0 32 a16 16 0 1 1 0 -32" />
+                <path
+                  className="pledge-ring-fill"
+                  strokeDasharray={`${avgPledgeProgress}, 100`}
+                  d="M18 2 a16 16 0 1 1 0 32 a16 16 0 1 1 0 -32"
+                />
+              </svg>
+              <strong className="feature-value">{avgPledgeProgress}%</strong>
+            </div>
+            <small className="feature-caption">전체 공약 평균 진행률</small>
+          </button>
+
+          <button type="button" className="feature-card" onClick={() => onNavigate('events')}>
+            <span className="feature-label">이벤트 · 선착순 신청</span>
+            <strong className="feature-value">{upcomingEvent.title}</strong>
+            <small className="feature-caption">
+              {upcomingEvent.applied}/{upcomingEvent.capacity}명 신청 · 마감 {upcomingEvent.deadline}
+            </small>
+          </button>
         </div>
       </section>
 

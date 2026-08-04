@@ -1,4 +1,5 @@
-import { detailMenu, primaryMenu } from '../data/menu';
+import { menu } from '../data/menu';
+import DepartmentSwitcher from './DepartmentSwitcher';
 
 function MenuButton({ item, activePage, onNavigate }) {
   const isActive = activePage === item.id;
@@ -14,21 +15,37 @@ function MenuButton({ item, activePage, onNavigate }) {
   );
 }
 
-export default function Sidebar({ activePage, onNavigate, open }) {
+export default function Sidebar({
+  activePage,
+  onNavigate,
+  open,
+  onClose,
+  selectedDepartment,
+  onSelectDepartment
+}) {
   return (
-    <aside className={open ? 'sidebar open' : 'sidebar'}>
-      <div className="sidebar-title">사이드바</div>
-      <nav className="side-nav">
-        <p className="side-section-title">메인</p>
-        {primaryMenu.map((item) => (
-          <MenuButton key={item.id} item={item} activePage={activePage} onNavigate={onNavigate} />
-        ))}
+    <>
+      {open && <button type="button" className="sidebar-backdrop" aria-label="메뉴 닫기" onClick={onClose} />}
 
-        <p className="side-section-title">세부탭</p>
-        {detailMenu.map((item) => (
-          <MenuButton key={item.id} item={item} activePage={activePage} onNavigate={onNavigate} />
-        ))}
-      </nav>
-    </aside>
+      <aside className={open ? 'sidebar open' : 'sidebar'}>
+        <div className="sidebar-head">
+          <span className="sidebar-title">메뉴</span>
+          <button type="button" className="sidebar-close" aria-label="메뉴 닫기" onClick={onClose}>✕</button>
+        </div>
+
+        <p className="side-section-title">자치부서</p>
+        <DepartmentSwitcher
+          selectedDepartment={selectedDepartment}
+          activePage={activePage}
+          onSelect={onSelectDepartment}
+        />
+
+        <nav className="side-nav">
+          {menu.map((item) => (
+            <MenuButton key={item.id} item={item} activePage={activePage} onNavigate={onNavigate} />
+          ))}
+        </nav>
+      </aside>
+    </>
   );
 }

@@ -124,93 +124,91 @@
   color: var(--ink);
 }
 
-/* 오늘의 요약 */
-.summary-grid {
+/* 홈 주요 기능 (오늘의 급식 / 최근 설문 / 공약 이행도 / 이벤트) */
+.feature-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
 }
 
-.stat-card {
+.feature-card {
   display: grid;
-  gap: 0.35rem;
-  min-height: 8rem;
+  gap: 0.4rem;
+  min-height: 9.5rem;
   padding: 1.3rem;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--dept-color);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   text-align: left;
   color: var(--ink);
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
 
-button.stat-card:hover {
+button.feature-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
 
-.stat-card span,
-.stat-card small {
+.feature-label {
   color: var(--ink-soft);
-}
-
-.stat-card span {
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-.stat-card strong {
-  font-size: 1.35rem;
+.feature-value {
+  font-size: 1.15rem;
   line-height: 1.3;
   letter-spacing: -0.03em;
 }
 
-/* 북마크 */
-.bookmark-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+.feature-caption {
+  color: var(--ink-soft);
 }
 
-.bookmark-card {
+.feature-survey {
+  gap: 0.5rem;
+}
+
+.feature-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.feature-actions .link-button,
+.feature-actions .ghost-button {
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+/* 공약 이행도 도넛 차트 */
+.pledge-chart {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
-  padding: 1.1rem 1.25rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  text-align: left;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s var(--ease);
+  gap: 0.8rem;
 }
 
-.bookmark-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--dept-color);
+.pledge-ring {
+  width: 3.2rem;
+  height: 3.2rem;
+  flex: 0 0 auto;
 }
 
-.bookmark-icon {
-  display: grid;
-  place-items: center;
-  width: 2.8rem;
-  height: 2.8rem;
-  border-radius: var(--radius-sm);
-  background: #ffffff;
-  border: 1px solid var(--line);
-  font-size: 1.5rem;
+.pledge-ring-bg {
+  fill: none;
+  stroke: #f0f0f2;
+  stroke-width: 3.5;
 }
 
-.bookmark-text {
-  display: grid;
-  gap: 0.15rem;
-}
-
-.bookmark-text strong {
-  font-size: 1rem;
-  color: #111111;
-}
-
-.bookmark-text small {
-  color: #4b5563;
+.pledge-ring-fill {
+  fill: none;
+  stroke: var(--dept-color);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s var(--ease);
 }
 
 /* 최근 사진 (mock 이미지 = 부서색 그라데이션 카드) */
@@ -740,8 +738,7 @@ button.stat-card:hover {
 
 /* ── 반응형 ─────────────────────────────────────────────── */
 @media (max-width: 1180px) {
-  .summary-grid,
-  .bookmark-grid,
+  .feature-grid,
   .gallery-grid,
   .media-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -753,8 +750,7 @@ button.stat-card:hover {
 }
 
 @media (max-width: 760px) {
-  .summary-grid,
-  .bookmark-grid,
+  .feature-grid,
   .gallery-grid,
   .list-grid,
   .media-grid {

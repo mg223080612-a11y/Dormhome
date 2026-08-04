@@ -1,10 +1,10 @@
 import { getDepartment } from '../data/departments';
-import { allMenu } from '../data/menu';
+import { menu } from '../data/menu';
 
 export default function DepartmentPage({ department, onNavigate }) {
   const dept = getDepartment(department);
   const focusItems = (dept.focus || [])
-    .map((id) => allMenu.find((item) => item.id === id))
+    .map((id) => menu.find((item) => item.id === id))
     .filter(Boolean);
 
   return (

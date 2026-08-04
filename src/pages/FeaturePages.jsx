@@ -2,15 +2,12 @@ import { useState } from 'react';
 import PageShell from '../components/PageShell';
 import {
   academicEvents,
-  birthdays,
-  dormSchedule,
+  events,
   initialMarketItems,
   initialTaxiRequests,
   pledges,
-  pointGuides,
   shortforms,
   surveys,
-  tips,
   weeklyMeals,
   weeklyVerse
 } from '../data/mockData';
@@ -150,6 +147,52 @@ export function PledgePage() {
             <strong>{pledge.progress}%</strong>
           </article>
         ))}
+      </div>
+    </PageShell>
+  );
+}
+
+export function EventPage({ session }) {
+  const [applicants, setApplicants] = useState(() => readStorage('event-applicants', {}));
+
+  const join = (event) => {
+    const list = applicants[event.id] || [];
+    if (list.includes(session.name)) return;
+    if (event.applied + list.length >= event.capacity) return;
+    const next = { ...applicants, [event.id]: [...list, session.name] };
+    writeStorage('event-applicants', next);
+    setApplicants(next);
+  };
+
+  return (
+    <PageShell title="이벤트" description="숏폼 콘테스트, 휴지 쟁탈전 등 선착순 신청 이벤트에 참여해 보세요.">
+      <div className="list-grid">
+        {events.map((event) => {
+          const list = applicants[event.id] || [];
+          const current = event.applied + list.length;
+          const full = current >= event.capacity;
+          const joined = list.includes(session.name);
+
+          return (
+            <article key={event.id} className="simple-card event-card">
+              <div className="between">
+                <h3>{event.title}</h3>
+                <span className="badge">{event.tag}</span>
+              </div>
+              <p>{event.description}</p>
+              <small>마감: {event.deadline} · 선착순 {event.capacity}명</small>
+              <div className="progress-track">
+                <div className="progress-fill" style={{ width: `${Math.min(100, (current / event.capacity) * 100)}%` }} />
+              </div>
+              <div className="between">
+                <strong>{current}/{event.capacity}명 신청</strong>
+                <button type="button" disabled={full || joined} onClick={() => join(event)}>
+                  {joined ? '신청 완료' : full ? '마감' : '선착순 신청'}
+                </button>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </PageShell>
   );
@@ -355,71 +398,6 @@ export function DormRepairPage({ session }) {
   );
 }
 
-export function AcademicPage() {
-  const exams = academicEvents.filter((event) => event.type === 'exam');
-  return (
-    <PageShell title="학사일정 / 주요 일정 카운트" description="중간고사, 기말고사, 주요 행사까지 남은 일수를 보여줍니다.">
-      <div className="list-grid">
-        {exams.map((exam) => (
-          <article key={exam.id} className="countdown-card">
-            <span>{exam.title}</span>
-            <strong>{daysUntil(exam.date) >= 0 ? `D-${daysUntil(exam.date)}` : '종료'}</strong>
-            <small>{exam.date}</small>
-          </article>
-        ))}
-      </div>
-    </PageShell>
-  );
-}
-
-export function PointsPage() {
-  return (
-    <PageShell title="상점 관련" description="상점 기준과 생활 규정 안내를 카드 형태로 정리합니다.">
-      <div className="list-grid">
-        {pointGuides.map((guide) => (
-          <article key={guide.title} className="simple-card">
-            <h3>{guide.title}</h3>
-            <ul className="clean-list">
-              {guide.items.map((item) => <li key={item}>{item}</li>)}
-            </ul>
-          </article>
-        ))}
-      </div>
-    </PageShell>
-  );
-}
-
-export function TipsPage() {
-  return (
-    <PageShell title="생활관 꿀팁" description="생활관 적응과 공동체 생활에 필요한 노하우를 모읍니다.">
-      <div className="list-grid">
-        {tips.map((tip) => (
-          <article key={tip.title} className="simple-card">
-            <h3>{tip.title}</h3>
-            <p>{tip.body}</p>
-          </article>
-        ))}
-      </div>
-    </PageShell>
-  );
-}
-
-export function BirthdayPage() {
-  return (
-    <PageShell title="달력 / 생일자" description="월별 생일자를 확인합니다. 실제 운영 시 공개 범위 동의가 필요합니다.">
-      <div className="list-grid">
-        {birthdays.map((person) => (
-          <article key={person.id} className="simple-card birthday-card">
-            <strong>{person.date}</strong>
-            <h3>{person.name}</h3>
-            <p>{person.grade}학년</p>
-          </article>
-        ))}
-      </div>
-    </PageShell>
-  );
-}
-
 export function VersePage() {
   return (
     <PageShell title="주별 말씀" description="한 주의 말씀과 적용 메모를 올립니다.">
@@ -428,24 +406,6 @@ export function VersePage() {
         <h2>{weeklyVerse.text}</h2>
         <p>{weeklyVerse.memo}</p>
       </article>
-    </PageShell>
-  );
-}
-
-export function DormSchedulePage() {
-  return (
-    <PageShell title="생활관 스케줄표" description="생활관 하루 흐름을 시간표로 정리합니다.">
-      <div className="timeline compact">
-        {dormSchedule.map((item) => (
-          <article key={item.time} className="timeline-item">
-            <div className="date-box"><strong>{item.time}</strong></div>
-            <div>
-              <h3>{item.title}</h3>
-              <p>{item.place}</p>
-            </div>
-          </article>
-        ))}
-      </div>
     </PageShell>
   );
 }

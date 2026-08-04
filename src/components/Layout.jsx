@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import DepartmentSwitcher from './DepartmentSwitcher';
+import HomeHero from './HomeHero';
 import Sidebar from './Sidebar';
 
 export default function Layout({
@@ -12,10 +12,10 @@ export default function Layout({
   onLoginClick,
   children
 }) {
-  // 좁은 화면에서 사이드바 펼침 여부
+  // 슬라이드 메뉴(사이드바) 펼침 여부
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // 메뉴 선택 / 부서 선택 시 사이드바를 닫습니다.
+  // 메뉴 선택 / 부서 선택 시 슬라이드 메뉴를 닫습니다.
   const navigateAndClose = (page) => {
     setMenuOpen(false);
     onNavigate(page);
@@ -29,17 +29,22 @@ export default function Layout({
   return (
     <div className="app-shell">
       <header className="top-bar">
-        <button className="brand-pill" type="button" onClick={() => navigateAndClose('home')}>
-          <img src="/favicon.png" alt="" className="brand-mark" aria-hidden="true" />
-          GVCS
-        </button>
+        <div className="top-bar-left">
+          <button
+            type="button"
+            className="hamburger-btn"
+            aria-expanded={menuOpen}
+            aria-label="메뉴 열기"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
 
-        <div className="top-menu-pill">
-          <DepartmentSwitcher
-            selectedDepartment={selectedDepartment}
-            activePage={activePage}
-            onSelect={selectDeptAndClose}
-          />
+          <button type="button" className="home-logo-btn" aria-label="홈으로 이동" onClick={() => navigateAndClose('home')}>
+            <img src="/sos-mark.svg" alt="SOS" />
+          </button>
         </div>
 
         <div className="user-pill">
@@ -49,37 +54,37 @@ export default function Layout({
               <button type="button" onClick={onLogout}>로그아웃</button>
             </>
           ) : (
-            <button type="button" className="login-trigger" onClick={onLoginClick}>로그인</button>
+            <button type="button" className="login-trigger" onClick={onLoginClick}>login</button>
           )}
         </div>
       </header>
 
-      {/* 좁은 화면에서만 보이는 메뉴 토글 */}
-      <button
-        type="button"
-        className="menu-toggle"
-        aria-expanded={menuOpen}
-        onClick={() => setMenuOpen((open) => !open)}
-      >
-        {menuOpen ? '✕' : '···'}
-      </button>
+      <Sidebar
+        activePage={activePage}
+        onNavigate={navigateAndClose}
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        selectedDepartment={selectedDepartment}
+        onSelectDepartment={selectDeptAndClose}
+      />
 
-      <div className="main-grid">
-        <Sidebar activePage={activePage} onNavigate={navigateAndClose} open={menuOpen} />
+      {activePage === 'home' && <HomeHero onNavigate={navigateAndClose} />}
+
+      <div className="page-body">
         <main className="content-panel">
           {children}
         </main>
-      </div>
 
-      <footer className="site-credit">
-        <span className="credit-prefix">made by <strong>GVCS MG coding club</strong></span>
-        <span className="credit-collab" aria-label="Sync x SOS">
-          <img src="/sync-mark.png" alt="Sync" className="sync-mark" />
-          <strong>Sync</strong>
-          <span className="credit-x">x</span>
-          <img src="/sos-mark.png" alt="SOS" className="sos-mark" />
-        </span>
-      </footer>
+        <footer className="site-credit">
+          <span className="credit-prefix">made by <strong>GVCS MG coding club</strong></span>
+          <span className="credit-collab" aria-label="Sync x SOS">
+            <img src="/sync-mark.png" alt="Sync" className="sync-mark" />
+            <strong>Sync</strong>
+            <span className="credit-x">x</span>
+            <img src="/sos-mark.svg" alt="SOS" className="sos-mark" />
+          </span>
+        </footer>
+      </div>
     </div>
   );
 }

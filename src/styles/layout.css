@@ -4,65 +4,75 @@
 
 .app-shell {
   min-height: 100vh;
-  padding: 1.5rem;
   background: var(--bg);
 }
 
-/* ── 상단바 (검정 바 + 우측 로그인) ───────────────────────── */
+/* ── 상단바 (검정 바, 좌: 햄버거 / 우: 로그인) ─────────────── */
 .top-bar {
-  display: grid;
-  grid-template-columns: 16.5rem minmax(0, 1fr) auto;
-  gap: 1rem;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   position: sticky;
-  top: 1rem;
-  z-index: 20;
-  max-width: 1320px;
-  margin: 0 auto 2rem;
-  padding: 0.6rem 0.8rem;
-  background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  top: 0;
+  z-index: 30;
+  padding: 1.1rem 1.75rem;
+  background: #0a0a0a;
+  color: #ffffff;
 }
 
-.brand-pill {
-  display: inline-flex;
+.top-bar-left {
+  display: flex;
   align-items: center;
-  justify-self: start;
-  gap: 0.55rem;
-  min-height: 3rem;
-  padding: 0 0.8rem;
+  gap: 0.9rem;
+}
+
+.hamburger-btn {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 2.4rem;
+  height: 2.4rem;
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: #111111;
-  font-weight: 800;
-  font-size: 1.2rem;
-  letter-spacing: -0.03em;
+  padding: 0;
 }
 
-.brand-pill:hover {
-  opacity: 0.7;
+.hamburger-btn span {
+  display: block;
+  width: 1.5rem;
+  height: 2px;
+  background: #ffffff;
+  border-radius: 2px;
 }
 
-.brand-mark {
-  width: 2rem;
-  height: 2rem;
-  object-fit: contain;
-  flex: 0 0 auto;
+.hamburger-btn:hover {
+  opacity: 0.8;
 }
 
-.top-menu-pill {
-  display: flex;
-  justify-content: flex-start;
-  min-width: 0;
+.home-logo-btn {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.home-logo-btn img {
+  display: block;
+  height: 1.7rem;
+  width: auto;
+}
+
+.home-logo-btn:hover {
+  opacity: 0.85;
 }
 
 .dept-switcher {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem;
+  gap: 0.55rem;
   justify-content: flex-start;
 }
 
@@ -91,10 +101,8 @@
 .user-pill {
   display: flex;
   align-items: center;
-  justify-self: end;
   gap: 0.6rem;
-  padding-right: 0.4rem;
-  color: #111111;
+  color: #ffffff;
 }
 
 .account-chip {
@@ -104,42 +112,74 @@
 
 .user-pill button {
   border: 0;
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 1rem;
-  background: #f1f1f3;
-  color: #111111;
+  border-radius: 999px;
+  padding: 0.55rem 1.3rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
   font-size: 0.88rem;
   font-weight: 700;
   transition: background 0.2s var(--ease);
 }
 
 .user-pill button:hover {
-  background: #e4e4e8;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .login-trigger {
-  background: #111111 !important;
-  color: #ffffff !important;
+  background: #ffffff !important;
+  color: #111111 !important;
 }
 
-/* ── 본문 그리드 (사이드바 + 콘텐츠) ──────────────────────── */
-.main-grid {
-  display: grid;
-  grid-template-columns: 15rem minmax(0, 1fr);
-  gap: 1.5rem;
-  max-width: 1320px;
-  margin: 0 auto;
+/* ── 사이드바 (햄버거로 여는 슬라이드 패널) ───────────────── */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border: 0;
+  padding: 0;
+  background: rgba(10, 10, 10, 0.5);
+  cursor: default;
 }
 
 .sidebar {
-  align-self: start;
-  position: sticky;
-  top: 6.5rem;
-  padding: 1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: 18.5rem;
+  max-width: 85vw;
+  height: 100vh;
+  padding: 1.1rem 1rem 1.5rem;
   background: var(--surface);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 0.28s var(--ease);
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.sidebar-close {
+  border: 0;
+  border-radius: var(--radius-sm);
+  width: 2rem;
+  height: 2rem;
+  background: #f1f1f3;
+  color: #111111;
+  font-size: 0.95rem;
+}
+
+.sidebar-close:hover {
+  background: #e4e4e8;
 }
 
 .sidebar-title {
@@ -154,8 +194,6 @@
 .side-nav {
   display: grid;
   gap: 0.15rem;
-  max-height: calc(100vh - 11rem);
-  overflow-y: auto;
 }
 
 .side-section-title {
@@ -204,6 +242,12 @@
   font-size: 1.05rem;
 }
 
+.page-body {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem;
+}
+
 .content-panel {
   min-width: 0;
 }
@@ -214,8 +258,7 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.65rem;
-  max-width: 1320px;
-  margin: 2.5rem auto 0;
+  margin: 2.5rem 0 0;
   padding: 1.25rem 1rem;
   border-top: 1px solid var(--line);
   color: #6b7280;
@@ -260,73 +303,57 @@
   flex: 0 0 auto;
 }
 
-/* 메뉴 토글 버튼 (넓은 화면에서는 숨김) */
-.menu-toggle {
-  display: none;
+/* ── 홈 히어로 (검정 배경 + SOS 로고 + 주별말씀) ──────────── */
+.home-hero {
+  display: flex;
   align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 1rem;
-  padding: 0.65rem 1.1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: #ffffff;
-  color: var(--ink);
-  font-weight: 700;
-  box-shadow: var(--shadow-sm);
+  justify-content: center;
+  padding: 3rem 1.5rem 4.5rem;
+  min-height: 58vh;
+  background: #0a0a0a;
+}
+
+.home-hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: center;
+}
+
+.home-hero-inner:hover .home-hero-mark {
+  transform: translateY(-3px);
+}
+
+.home-hero-mark {
+  width: min(42rem, 78vw);
+  height: auto;
+  transition: transform 0.25s var(--ease);
+}
+
+.home-hero-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.8rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 /* ── 반응형 ─────────────────────────────────────────────── */
-@media (max-width: 1080px) {
-  .main-grid {
-    grid-template-columns: 1fr;
-  }
-
-  /* 좁은 화면: 사이드바 숨김, '더보기' 버튼으로 펼침 */
-  .menu-toggle {
-    display: inline-flex;
-  }
-
-  .sidebar {
-    display: none;
-    position: static;
-    margin-bottom: 1.25rem;
-  }
-
-  .sidebar.open {
-    display: block;
-  }
-
-  .side-nav {
-    max-height: none;
-  }
-}
-
-/* 부서 탭이 많아 좁아지면 상단 바를 2줄로: 위(로고·로그인) / 아래(탭, 가로 스크롤) */
-@media (max-width: 960px) {
-  .top-bar {
-    grid-template-columns: auto 1fr;
-    gap: 0.6rem;
-    border-radius: var(--radius-lg);
-  }
-
-  .top-menu-pill {
-    grid-column: 1 / -1;
-    order: 3;
-    justify-content: flex-start;
-    overflow-x: auto;
-  }
-
-  .dept-switcher {
-    flex-wrap: nowrap; /* 줄바꿈 대신 한 줄 유지 + 가로 스크롤 */
-  }
-
-  .user-pill {
-    justify-content: flex-end;
-  }
-}
-
 @media (max-width: 720px) {
-  .app-shell {
-    padding: 0.85rem;
+  .top-bar {
+    padding: 1rem 1.1rem;
+  }
+
+  .page-body {
+    padding: 1.25rem 1rem;
+  }
+
+  .home-hero {
+    min-height: 46vh;
+    padding: 2.25rem 1.25rem 3rem;
   }
 }
