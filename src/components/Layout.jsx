@@ -1,29 +1,21 @@
 import { useState } from 'react';
 import HomeHero from './HomeHero';
 import Sidebar from './Sidebar';
+import { mainTabs } from '../data/menu';
 
 export default function Layout({
   session,
-  selectedDepartment,
-  onSelectDepartment,
   activePage,
   onNavigate,
   onLogout,
   onLoginClick,
   children
 }) {
-  // 슬라이드 메뉴(사이드바) 펼침 여부
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // 메뉴 선택 / 부서 선택 시 슬라이드 메뉴를 닫습니다.
   const navigateAndClose = (page) => {
     setMenuOpen(false);
     onNavigate(page);
-  };
-
-  const selectDeptAndClose = (id) => {
-    setMenuOpen(false);
-    onSelectDepartment(id);
   };
 
   return (
@@ -33,19 +25,28 @@ export default function Layout({
           <button
             type="button"
             className="hamburger-btn"
-            aria-expanded={menuOpen}
-            aria-label="메뉴 열기"
-            onClick={() => setMenuOpen((open) => !open)}
+            aria-label="메뉴"
+            onClick={() => setMenuOpen((o) => !o)}
           >
-            <span />
-            <span />
-            <span />
+            <span /><span /><span />
           </button>
-
-          <button type="button" className="home-logo-btn" aria-label="홈으로 이동" onClick={() => navigateAndClose('home')}>
+          <button type="button" className="home-logo-btn" onClick={() => navigateAndClose('home')}>
             <img src="/sos-mark.svg" alt="SOS" />
           </button>
         </div>
+
+        <nav className="top-tabs">
+          {mainTabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={activePage === tab.id ? 'top-tab active' : 'top-tab'}
+              onClick={() => navigateAndClose(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
 
         <div className="user-pill">
           {session ? (
@@ -59,31 +60,29 @@ export default function Layout({
         </div>
       </header>
 
-      <Sidebar
-        activePage={activePage}
-        onNavigate={navigateAndClose}
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        selectedDepartment={selectedDepartment}
-        onSelectDepartment={selectDeptAndClose}
-      />
+      <div className="main-layout">
+        <Sidebar
+          activePage={activePage}
+          onNavigate={navigateAndClose}
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+        />
 
-      {activePage === 'home' && <HomeHero onNavigate={navigateAndClose} />}
-
-      <div className="page-body">
-        <main className="content-panel">
-          {children}
-        </main>
-
-        <footer className="site-credit">
-          <span className="credit-prefix">made by <strong>GVCS MG coding club</strong></span>
-          <span className="credit-collab" aria-label="Sync x SOS">
-            <img src="/sync-mark.png" alt="Sync" className="sync-mark" />
-            <strong>Sync</strong>
-            <span className="credit-x">x</span>
-            <img src="/sos-mark.svg" alt="SOS" className="sos-mark" />
-          </span>
-        </footer>
+        <div className="content-area">
+          {activePage === 'home' && <HomeHero onNavigate={navigateAndClose} />}
+          <div className="page-body">
+            <main className="content-panel">{children}</main>
+            <footer className="site-credit">
+              <span className="credit-prefix">made by <strong>GVCS MG coding club</strong></span>
+              <span className="credit-collab">
+                <img src="/sync-mark.png" alt="Sync" className="sync-mark" />
+                <strong>Sync</strong>
+                <span className="credit-x">x</span>
+                <img src="/sos-mark.svg" alt="SOS" className="sos-mark" />
+              </span>
+            </footer>
+          </div>
+        </div>
       </div>
     </div>
   );

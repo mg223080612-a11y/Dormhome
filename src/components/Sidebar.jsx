@@ -1,12 +1,12 @@
 import { menu } from '../data/menu';
-import DepartmentSwitcher from './DepartmentSwitcher';
+
+const PRIMARY_IDS = new Set(['home', 'survey', 'pledges', 'events']);
 
 function MenuButton({ item, activePage, onNavigate }) {
-  const isActive = activePage === item.id;
   return (
     <button
       type="button"
-      className={isActive ? 'side-item active' : 'side-item'}
+      className={activePage === item.id ? 'side-item active' : 'side-item'}
       onClick={() => onNavigate(item.id)}
     >
       <span className="side-icon">{item.icon}</span>
@@ -15,33 +15,28 @@ function MenuButton({ item, activePage, onNavigate }) {
   );
 }
 
-export default function Sidebar({
-  activePage,
-  onNavigate,
-  open,
-  onClose,
-  selectedDepartment,
-  onSelectDepartment
-}) {
+export default function Sidebar({ activePage, onNavigate, open, onClose }) {
+  const primary = menu.filter((m) => PRIMARY_IDS.has(m.id));
+  const secondary = menu.filter((m) => !PRIMARY_IDS.has(m.id));
+
   return (
     <>
       {open && <button type="button" className="sidebar-backdrop" aria-label="메뉴 닫기" onClick={onClose} />}
 
-      <aside className={open ? 'sidebar open' : 'sidebar'}>
-        <div className="sidebar-head">
-          <span className="sidebar-title">메뉴</span>
-          <button type="button" className="sidebar-close" aria-label="메뉴 닫기" onClick={onClose}>✕</button>
+      <aside className={`sidebar${open ? ' open' : ''}`}>
+        <div className="sidebar-brand">
+          <img src="/sos-mark.svg" alt="SOS" className="sidebar-logo" />
+          <img src="/sync-mark.png" alt="Sync" className="sidebar-sync" />
         </div>
 
-        <p className="side-section-title">자치부서</p>
-        <DepartmentSwitcher
-          selectedDepartment={selectedDepartment}
-          activePage={activePage}
-          onSelect={onSelectDepartment}
-        />
-
         <nav className="side-nav">
-          {menu.map((item) => (
+          {primary.map((item) => (
+            <MenuButton key={item.id} item={item} activePage={activePage} onNavigate={onNavigate} />
+          ))}
+
+          <hr className="side-divider" />
+
+          {secondary.map((item) => (
             <MenuButton key={item.id} item={item} activePage={activePage} onNavigate={onNavigate} />
           ))}
         </nav>

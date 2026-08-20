@@ -101,8 +101,6 @@ export default function App() {
   return (
     <Layout
       session={session}
-      selectedDepartment={selectedDepartment}
-      onSelectDepartment={selectDepartment}
       activePage={activePage}
       onNavigate={navigate}
       onLogout={logout}
