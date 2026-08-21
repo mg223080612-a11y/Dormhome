@@ -162,12 +162,14 @@
 }
 
 .sidebar {
+  display: flex;
+  flex-direction: column;
   position: sticky;
   top: var(--top-bar-h);
   width: var(--sidebar-w);
   height: calc(100vh - var(--top-bar-h));
   flex-shrink: 0;
-  padding: 1.25rem 0.75rem 1.5rem;
+  padding: 1.25rem 0.75rem 1rem;
   background: #ffffff;
   border-right: 1px solid #f0f0f0;
   overflow-y: auto;
@@ -234,9 +236,31 @@
 }
 
 .side-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 1.3rem;
-  text-align: center;
-  font-size: 0.95rem;
+  height: 1.3rem;
+  flex-shrink: 0;
+}
+
+.side-svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.side-settings {
+  color: #94a3b8;
+}
+
+.side-settings:hover {
+  color: #64748b;
 }
 
 /* ── 콘텐츠 영역 ──────────────────────────────────────────── */
