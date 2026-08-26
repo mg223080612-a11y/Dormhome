@@ -20,6 +20,7 @@ const ICONS = {
   camera: I(<><rect x="2" y="5" width="16" height="12" rx="1.5" /><circle cx="10" cy="11" r="3" /><path d="M14 5l1-2h-3l-1 2" /></>),
   market: I(<><path d="M5 3h10l2 5H3l2-5zM4 8v8a1 1 0 001 1h10a1 1 0 001-1V8" /><path d="M8 12v2h4v-2" /></>),
   settings: I(<><circle cx="10" cy="10" r="2.5" /><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.2 4.2l1.5 1.5M14.3 14.3l1.5 1.5M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5" /></>),
+  admin: I(<><rect x="3" y="3" width="14" height="14" rx="2" /><path d="M3 7h14M7 3v14" /></>),
 };
 
 function MenuButton({ item, activePage, onNavigate }) {
@@ -75,9 +76,13 @@ export default function Sidebar({ session, activePage, onNavigate, open, onClose
               <button type="button" className="login-trigger" onClick={onLoginClick}>login</button>
             )}
           </div>
-          <button type="button" className="side-item side-settings">
-            <span className="side-icon">{ICONS.settings}</span>
-            <span>Settings</span>
+          <button
+            type="button"
+            className={activePage === 'admin' ? 'side-item active' : 'side-item'}
+            onClick={() => onNavigate('admin')}
+          >
+            <span className="side-icon">{ICONS.admin}</span>
+            <span>Admin</span>
           </button>
         </div>
       </aside>

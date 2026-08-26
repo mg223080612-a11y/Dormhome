@@ -34,8 +34,11 @@ function EmptyState({ text }) {
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
 // 월 단위 달력. 일정은 해당 날짜 칸에 표시하며, 이전/다음 버튼으로 연·월을 이동할 수 있습니다.
-function MonthCalendar({ events, year = 2026, month = 6 }) {
-  const [view, setView] = useState({ year, month });
+function MonthCalendar({ events }) {
+  const now = new Date();
+  const defaultYear = now.getFullYear();
+  const defaultMonth = now.getMonth() + 1;
+  const [view, setView] = useState({ year: defaultYear, month: defaultMonth });
   const goMonth = (delta) => {
     setView((prev) => {
       const next = prev.month + delta;
@@ -72,6 +75,9 @@ function MonthCalendar({ events, year = 2026, month = 6 }) {
         <button type="button" className="calendar-nav-btn" onClick={() => goMonth(-1)} aria-label="이전 달">‹</button>
         <div className="calendar-title">{view.year}년 {view.month}월</div>
         <button type="button" className="calendar-nav-btn" onClick={() => goMonth(1)} aria-label="다음 달">›</button>
+        {!(view.year === defaultYear && view.month === defaultMonth) && (
+          <button type="button" className="calendar-today-btn" onClick={() => setView({ year: defaultYear, month: defaultMonth })}>오늘</button>
+        )}
       </div>
       <div className="calendar-grid">
         {WEEKDAYS.map((name, index) => (
@@ -107,25 +113,34 @@ function MonthCalendar({ events, year = 2026, month = 6 }) {
 }
 
 export function CalendarPage() {
+  const calEvents = readStorage('admin-events', academicEvents);
+  const upcoming = calEvents
+    .filter((e) => daysUntil(e.date) >= 0)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
   return (
     <PageShell title="달력 / 스케줄표" description="학교 주요 일정, 시험, 부서 일정을 한눈에 확인합니다.">
-      <MonthCalendar events={academicEvents} year={2026} month={6} />
+      <MonthCalendar events={calEvents} />
 
-      <h3 className="subhead">일정 목록</h3>
-      <div className="timeline">
-        {academicEvents.map((event) => (
-          <article key={event.id} className="timeline-item">
-            <div className="date-box">
-              <strong>{dateLabel(event.date)}</strong>
-              <small>{daysUntil(event.date) >= 0 ? `D-${daysUntil(event.date)}` : '종료'}</small>
-            </div>
-            <div>
-              <h3>{event.title}</h3>
-              <p>{event.dept} · {event.type}</p>
-            </div>
-          </article>
-        ))}
-      </div>
+      {upcoming.length > 0 && (
+        <>
+          <h3 className="subhead">다가오는 일정</h3>
+          <div className="timeline">
+            {upcoming.map((event) => (
+              <article key={event.id} className="timeline-item">
+                <div className="date-box">
+                  <strong>{dateLabel(event.date)}</strong>
+                  <small>D-{daysUntil(event.date)}</small>
+                </div>
+                <div>
+                  <h3>{event.title}</h3>
+                  <p>{event.dept} · {event.type}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </>
+      )}
     </PageShell>
   );
 }

@@ -3,6 +3,7 @@ import Login from './components/Login';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import DepartmentPage from './pages/DepartmentPage';
+import AdminPage from './pages/AdminPage';
 import {
   CalendarPage,
   DormRepairPage,
@@ -99,7 +100,8 @@ export default function App() {
     shortform: <ShortformPage />,
     market: <MarketPage />,
     sos: <SosPage />,
-    sync: <SyncPage />
+    sync: <SyncPage />,
+    admin: <AdminPage />
   };
 
   return (
