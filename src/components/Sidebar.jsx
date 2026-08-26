@@ -35,15 +35,19 @@ function MenuButton({ item, activePage, onNavigate }) {
   );
 }
 
-export default function Sidebar({ activePage, onNavigate, open, onClose }) {
+export default function Sidebar({ session, activePage, onNavigate, open, onClose, onLogout, onLoginClick }) {
   return (
     <>
       {open && <button type="button" className="sidebar-backdrop" aria-label="메뉴 닫기" onClick={onClose} />}
 
       <aside className={`sidebar${open ? ' open' : ''}`}>
         <div className="sidebar-brand">
-          <img src="/sos-mark.svg" alt="SOS" className="sidebar-logo" />
-          <img src="/sync-mark.png" alt="Sync" className="sidebar-sync" />
+          <button type="button" className="brand-link" onClick={() => onNavigate('sos')}>
+            <img src="/sos-mark.svg" alt="SOS" className="sidebar-logo" />
+          </button>
+          <button type="button" className="brand-link" onClick={() => onNavigate('sync')}>
+            <img src="/sync-mark.png" alt="Sync" className="sidebar-sync" />
+          </button>
         </div>
 
         <nav className="side-nav">
@@ -61,6 +65,16 @@ export default function Sidebar({ activePage, onNavigate, open, onClose }) {
         </nav>
 
         <div className="sidebar-bottom">
+          <div className="sidebar-user">
+            {session ? (
+              <>
+                <span className="account-chip">{session.name}</span>
+                <button type="button" className="sidebar-logout" onClick={onLogout}>로그아웃</button>
+              </>
+            ) : (
+              <button type="button" className="login-trigger" onClick={onLoginClick}>login</button>
+            )}
+          </div>
           <button type="button" className="side-item side-settings">
             <span className="side-icon">{ICONS.settings}</span>
             <span>Settings</span>

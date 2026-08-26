@@ -499,6 +499,22 @@ export function MarketPage() {
   );
 }
 
+export function SosPage() {
+  return (
+    <PageShell title="SOS" description="SOS 소개 페이지입니다.">
+      <div className="empty-state">내용이 곧 추가됩니다.</div>
+    </PageShell>
+  );
+}
+
+export function SyncPage() {
+  return (
+    <PageShell title="Sync" description="Sync 소개 페이지입니다.">
+      <div className="empty-state">내용이 곧 추가됩니다.</div>
+    </PageShell>
+  );
+}
+
 export function NotFoundPage({ onNavigate }) {
   return (
     <PageShell title="페이지를 찾을 수 없습니다" description="좌측 메뉴에서 다시 선택해 주세요.">

@@ -16,6 +16,8 @@ import {
   SurveyPage,
   TaxiMatePage,
   VersePage,
+  SosPage,
+  SyncPage,
   WantedMenuPage
 } from './pages/FeaturePages';
 import { clearSession, loadSession } from './utils/auth';
@@ -95,7 +97,9 @@ export default function App() {
     cafeteriaWish: <WantedMenuPage type="cafeteria" />,
     storeWish: <WantedMenuPage type="store" />,
     shortform: <ShortformPage />,
-    market: <MarketPage />
+    market: <MarketPage />,
+    sos: <SosPage />,
+    sync: <SyncPage />
   };
 
   return (

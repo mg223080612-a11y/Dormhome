@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import HomeHero from './HomeHero';
 import Sidebar from './Sidebar';
-import { mainTabs } from '../data/menu';
 
 export default function Layout({
   session,
@@ -20,34 +19,18 @@ export default function Layout({
 
   return (
     <div className="app-shell">
-      <header className="top-bar">
-        <div className="top-bar-left">
-          <button
-            type="button"
-            className="hamburger-btn"
-            aria-label="메뉴"
-            onClick={() => setMenuOpen((o) => !o)}
-          >
-            <span /><span /><span />
-          </button>
-          <button type="button" className="home-logo-btn" onClick={() => navigateAndClose('home')}>
-            <img src="/sos-mark.svg" alt="SOS" />
-          </button>
-        </div>
-
-        <nav className="top-tabs">
-          {mainTabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              className={activePage === tab.id ? 'top-tab active' : 'top-tab'}
-              onClick={() => navigateAndClose(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-
+      <header className="mobile-bar">
+        <button
+          type="button"
+          className="hamburger-btn"
+          aria-label="메뉴"
+          onClick={() => setMenuOpen((o) => !o)}
+        >
+          <span /><span /><span />
+        </button>
+        <button type="button" className="home-logo-btn" onClick={() => navigateAndClose('home')}>
+          <img src="/sos-mark.svg" alt="SOS" />
+        </button>
         <div className="user-pill">
           {session ? (
             <>
@@ -62,10 +45,13 @@ export default function Layout({
 
       <div className="main-layout">
         <Sidebar
+          session={session}
           activePage={activePage}
           onNavigate={navigateAndClose}
           open={menuOpen}
           onClose={() => setMenuOpen(false)}
+          onLogout={onLogout}
+          onLoginClick={onLoginClick}
         />
 
         <div className="content-area">
