@@ -12,26 +12,29 @@ import {
   setPersistence
 } from 'firebase/auth';
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+// dormhome-1c840 프로젝트의 웹 앱 설정 (Firebase 콘솔 > 프로젝트 설정 > 내 앱)
+const DEFAULT_CONFIG = {
+  apiKey: 'AIzaSyA6cpFJG1WS1pa2YX-XjmE-eNbBXrX_sm8',
+  authDomain: 'dormhome-1c840.firebaseapp.com',
+  projectId: 'dormhome-1c840',
+  storageBucket: 'dormhome-1c840.firebasestorage.app',
+  messagingSenderId: '566295157537',
+  appId: '1:566295157537:web:9dd664a8e1892fe2a17c60'
 };
 
-// 설정 누락 시 조기에 알려주기 (빈 값으로 초기화되면 원인 파악이 어렵습니다)
-const missing = Object.entries(firebaseConfig)
-  .filter(([, value]) => !value)
-  .map(([key]) => key);
+const pick = (envValue, fallback) => String(envValue || '').trim() || fallback;
 
-if (missing.length) {
-  console.error(
-    `[firebase] .env 설정이 비어 있습니다: ${missing.join(', ')}\n` +
-      '프로젝트 루트에 .env 파일을 만들고 VITE_FIREBASE_* 값을 채운 뒤 dev 서버를 다시 실행하세요.'
-  );
-}
+const firebaseConfig = {
+  apiKey: pick(import.meta.env.VITE_FIREBASE_API_KEY, DEFAULT_CONFIG.apiKey),
+  authDomain: pick(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN, DEFAULT_CONFIG.authDomain),
+  projectId: pick(import.meta.env.VITE_FIREBASE_PROJECT_ID, DEFAULT_CONFIG.projectId),
+  storageBucket: pick(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET, DEFAULT_CONFIG.storageBucket),
+  messagingSenderId: pick(
+    import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    DEFAULT_CONFIG.messagingSenderId
+  ),
+  appId: pick(import.meta.env.VITE_FIREBASE_APP_ID, DEFAULT_CONFIG.appId)
+};
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
