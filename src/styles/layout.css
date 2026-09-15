@@ -428,11 +428,18 @@
   background: transparent;
   padding: 0;
   line-height: 0;
+  /* 이미지 왼쪽에 박혀 있는 스프링 노트 천공 스트립을 잘라내기 위해 */
+  overflow: hidden;
 }
 
 .hero-banner-img {
   display: block;
-  width: 100%;
+  /* 원본(1357px) 왼쪽 6px 에 스프링 노트 천공 스트립이 박혀 있어 잘라낸다.
+     6/1357 = 0.45%. 그만큼 넓힌 뒤 왼쪽으로 밀어 오른쪽 끝은 그대로 꽉 차게 둔다.
+     (부모 .hero-banner 의 overflow:hidden 이 삐져나온 부분을 가린다.) */
+  width: 100.45%;
+  margin-left: -0.45%;
+  max-width: none;
   height: auto;
   /* 잘리지 않도록 원본 비율 그대로 (가로로 긴 배너) */
   user-select: none;
