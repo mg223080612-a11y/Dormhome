@@ -203,6 +203,97 @@
   font-weight: 700;
 }
 
+/* ── 카테고리 그룹 (아코디언) ──────────────────────────────── */
+.side-group {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.side-row {
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  transition: background 0.15s var(--ease);
+}
+
+.side-row:hover {
+  background: #f1f5f9;
+}
+
+.side-row:hover .side-item {
+  color: #1e293b;
+}
+
+.side-row .side-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.side-row .side-item:hover {
+  background: transparent;
+}
+
+.side-row.active {
+  background: #1e293b;
+}
+
+.side-row.active .side-item,
+.side-row.active .side-toggle {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.side-row.active .side-item:hover {
+  background: transparent;
+}
+
+.side-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 2.2rem;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0;
+  background: transparent;
+  color: #94a3b8;
+}
+
+.side-toggle:hover {
+  color: #1e293b;
+}
+
+.side-chevron {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.2s var(--ease);
+}
+
+.side-chevron.open {
+  transform: rotate(90deg);
+}
+
+.side-sub {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0.1rem 0 0.4rem 1.15rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid #e9edf3;
+}
+
+.side-child {
+  min-height: 2.25rem;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.side-child .side-svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
 .side-icon {
   display: flex;
   align-items: center;
@@ -260,7 +351,7 @@
 .content-area {
   flex: 1;
   min-width: 0;
-  background: #f8f9fb;
+  background: #ffffff;
 }
 
 .page-body {
@@ -324,40 +415,73 @@
 /* ── 홈 히어로 ─────────────────────────────────────────────── */
 .home-hero {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1.5rem 4.5rem;
-  min-height: 50vh;
-  background: #0a0a0a;
-}
-
-.home-hero-inner {
-  display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.75rem;
+  background: #ffffff;
+}
+
+/* SOS 배너 이미지 한 장 — 잘리지 않게 원본 비율 그대로, 폭은 적당히 제한 */
+.hero-banner {
+  display: block;
+  width: 100%;
   border: 0;
   background: transparent;
   padding: 0;
+  line-height: 0;
+}
+
+.hero-banner-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* 잘리지 않도록 원본 비율 그대로 (가로로 긴 배너) */
+  user-select: none;
+  transition: filter 0.25s var(--ease);
+}
+
+.hero-banner:hover .hero-banner-img {
+  filter: brightness(1.03);
+}
+
+/* 배너 아래 이번 주 말씀 */
+.hero-verse {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 1.6rem 1.25rem 0.5rem;
   text-align: center;
 }
 
-.home-hero-inner:hover .home-hero-mark {
-  transform: translateY(-3px);
-}
-
-.home-hero-mark {
-  width: min(36rem, 75vw);
-  height: auto;
-  transition: transform 0.25s var(--ease);
-}
-
-.home-hero-title {
-  margin: 0;
-  color: #ffffff;
-  font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+.hero-verse-label {
+  color: #a1741f;
+  font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.24em;
+}
+
+.hero-verse-text {
+  margin: 0;
+  max-width: 40rem;
+  color: var(--sos-red);
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+.hero-verse-ref {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.hero-verse:hover .hero-verse-text {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
 }
 
 /* ── 반응형 ─────────────────────────────────────────────── */
@@ -400,14 +524,17 @@
     padding: 1.25rem 1rem;
   }
 
-  .home-hero {
-    min-height: 42vh;
-    padding: 2rem 1rem 3rem;
+  .hero-verse {
+    padding: 1.2rem 1rem 0.25rem;
   }
 }
 
 @media (max-width: 480px) {
   .user-pill .account-chip {
     display: none;
+  }
+
+  .hero-verse-label {
+    font-size: 0.68rem;
   }
 }

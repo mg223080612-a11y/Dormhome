@@ -6,14 +6,37 @@ React + Vite 기반의 자치부서 홈페이지 MVP입니다.
 
 ```bash
 npm install
+cp .env.example .env   # 값을 채운 뒤 저장
 npm run dev
 ```
 
 브라우저에서 표시되는 주소로 접속하면 됩니다.
 
+## Firebase 구글 로그인 설정
+
+1. **Firebase 콘솔 > Authentication > Sign-in method** 에서 **Google** 제공업체를 사용 설정합니다.
+2. **Authentication > Settings > 승인된 도메인**에 `localhost` 와 실제 배포 도메인을 추가합니다.
+3. **프로젝트 설정 > 내 앱 > SDK 설정 및 구성 > 구성** 에서 config 값을 복사해 `.env` 에 넣습니다.
+4. 로그인 허용 도메인은 **`gvcs-mg.org` 고정(기본값)** 입니다. `@gvcs-mg.org` 계정만 로그인·등록되며,
+   그 외 구글 계정은 로그인 직후 자동 로그아웃됩니다. 다른 도메인을 쓰려면 `.env` 의
+   `VITE_ALLOWED_EMAIL_DOMAIN` 값을 바꾸세요. (비워두면 기본값이 적용되며, 전체 허용으로 열리지 않습니다.)
+5. `.env` 를 바꾼 뒤에는 **dev 서버를 반드시 재시작**해야 값이 반영됩니다.
+
+관련 파일
+
+```txt
+src/lib/firebase.js   Firebase 앱·auth·GoogleAuthProvider 초기화
+src/utils/auth.js     로그인/로그아웃/상태구독/도메인 검증
+src/components/Login.jsx  구글 로그인 버튼 화면
+```
+
+> 도메인 검증은 프론트엔드에서만 이뤄지므로 우회가 가능합니다. 실제 데이터를 Firestore 로 옮길 때는
+> 보안 규칙에서 `request.auth.token.email` 의 도메인을 함께 검사하거나, 관리자 권한은
+> Custom Claims 로 부여하세요.
+
 ## 주요 기능
 
-- MG 번호 로그인 프로토타입
+- Firebase 구글 로그인 (`@gvcs-mg.org` 계정만 허용)
 - MG 끝자리 기반 택시메이트 남/여 그룹 분리
 - 자치부서별 색상 테마
   - 자치위원: 버건디

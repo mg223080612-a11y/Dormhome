@@ -206,29 +206,55 @@ function AdminMeals() {
 }
 
 function AdminVerse() {
-  const [verse, setVerse] = useState(() => readStorage('admin-verse', defaultVerse));
+  // 저장 버튼을 눌러야 반영됩니다. 저장하면 '주별 말씀' 페이지에 즉시 표시됩니다.
+  const [draft, setDraft] = useState(() => readStorage('admin-verse', defaultVerse));
+  const [saved, setSaved] = useState(false);
 
   const update = (field, value) => {
-    const next = { ...verse, [field]: value };
+    setDraft((prev) => ({ ...prev, [field]: value }));
+    setSaved(false);
+  };
+
+  const save = (event) => {
+    event.preventDefault();
+    const next = { ...draft, updatedAt: new Date().toISOString() };
     writeStorage('admin-verse', next);
-    setVerse(next);
+    setDraft(next);
+    setSaved(true);
+  };
+
+  const reset = () => {
+    const next = { ...defaultVerse, updatedAt: new Date().toISOString() };
+    writeStorage('admin-verse', next);
+    setDraft(next);
+    setSaved(true);
   };
 
   return (
-    <div className="admin-verse-form">
+    <form className="admin-verse-form" onSubmit={save}>
       <label>
         <span>구절 위치</span>
-        <input value={verse.reference} onChange={(e) => update('reference', e.target.value)} />
+        <input
+          value={draft.reference}
+          placeholder="예: 빌립보서 4:13"
+          onChange={(e) => update('reference', e.target.value)}
+        />
       </label>
       <label>
         <span>말씀</span>
-        <textarea value={verse.text} onChange={(e) => update('text', e.target.value)} />
+        <textarea value={draft.text} onChange={(e) => update('text', e.target.value)} />
       </label>
       <label>
         <span>적용 메모</span>
-        <textarea value={verse.memo} onChange={(e) => update('memo', e.target.value)} />
+        <textarea value={draft.memo} onChange={(e) => update('memo', e.target.value)} />
       </label>
-    </div>
+
+      <div className="admin-verse-actions">
+        <button type="submit">저장</button>
+        <button type="button" className="admin-del" onClick={reset}>기본값으로</button>
+        {saved && <span className="admin-verse-saved">저장되었습니다 · 주별 말씀 페이지에 반영됨</span>}
+      </div>
+    </form>
   );
 }
 

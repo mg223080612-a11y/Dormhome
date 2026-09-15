@@ -1,4 +1,5 @@
-import { primaryMenu, secondaryMenu } from '../data/menu';
+import { useEffect, useState } from 'react';
+import { navTree, parentOf } from '../data/menu';
 
 const I = (d) => (
   <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="side-svg">{d}</svg>
@@ -23,11 +24,27 @@ const ICONS = {
   admin: I(<><rect x="3" y="3" width="14" height="14" rx="2" /><path d="M3 7h14M7 3v14" /></>),
 };
 
-function MenuButton({ item, activePage, onNavigate }) {
+function Chevron({ open }) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={open ? 'side-chevron open' : 'side-chevron'}
+    >
+      <path d="M7 5l5 5-5 5" />
+    </svg>
+  );
+}
+
+function MenuButton({ item, activePage, onNavigate, className = 'side-item' }) {
   return (
     <button
       type="button"
-      className={activePage === item.id ? 'side-item active' : 'side-item'}
+      className={activePage === item.id ? `${className} active` : className}
       onClick={() => onNavigate(item.id)}
     >
       <span className="side-icon">{ICONS[item.icon]}</span>
@@ -37,6 +54,14 @@ function MenuButton({ item, activePage, onNavigate }) {
 }
 
 export default function Sidebar({ session, activePage, onNavigate, open, onClose, onLogout, onLoginClick }) {
+  // 현재 보고 있는 페이지가 속한 카테고리를 펼쳐 둡니다.
+  const [openGroup, setOpenGroup] = useState(() => parentOf(activePage));
+
+  useEffect(() => {
+    const group = parentOf(activePage);
+    if (group) setOpenGroup(group);
+  }, [activePage]);
+
   return (
     <>
       {open && <button type="button" className="sidebar-backdrop" aria-label="메뉴 닫기" onClick={onClose} />}
@@ -52,17 +77,52 @@ export default function Sidebar({ session, activePage, onNavigate, open, onClose
         </div>
 
         <nav className="side-nav">
-          {primaryMenu.map((item) => (
-            <MenuButton key={item.id} item={item} activePage={activePage} onNavigate={onNavigate} />
-          ))}
-        </nav>
+          {navTree.map((group) => {
+            const expanded = openGroup === group.id;
+            const rowActive = activePage === group.id;
 
-        <hr className="side-divider" />
+            return (
+              <div className="side-group" key={group.id}>
+                <div className={rowActive ? 'side-row active' : 'side-row'}>
+                  <button
+                    type="button"
+                    className="side-item side-parent"
+                    onClick={() => {
+                      setOpenGroup(group.id);
+                      onNavigate(group.id);
+                    }}
+                  >
+                    <span className="side-icon">{ICONS[group.icon]}</span>
+                    <span>{group.label}</span>
+                  </button>
 
-        <nav className="side-nav">
-          {secondaryMenu.map((item) => (
-            <MenuButton key={item.id} item={item} activePage={activePage} onNavigate={onNavigate} />
-          ))}
+                  <button
+                    type="button"
+                    className="side-toggle"
+                    aria-expanded={expanded}
+                    aria-label={`${group.label} 하위 메뉴 ${expanded ? '접기' : '펼치기'}`}
+                    onClick={() => setOpenGroup(expanded ? null : group.id)}
+                  >
+                    <Chevron open={expanded} />
+                  </button>
+                </div>
+
+                {expanded && (
+                  <div className="side-sub">
+                    {group.children.map((child) => (
+                      <MenuButton
+                        key={child.id}
+                        item={child}
+                        activePage={activePage}
+                        onNavigate={onNavigate}
+                        className="side-item side-child"
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         <div className="sidebar-bottom">

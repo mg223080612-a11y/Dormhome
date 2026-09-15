@@ -12,6 +12,7 @@ import {
   weeklyVerse
 } from '../data/mockData';
 import { addStorageItem, readStorage, writeStorage } from '../utils/storage';
+import useStoredValue from '../utils/useStoredValue';
 
 const dateLabel = (value) => {
   const date = new Date(`${value}T00:00:00`);
@@ -414,12 +415,25 @@ export function DormRepairPage({ session }) {
 }
 
 export function VersePage() {
+  // 관리자 페이지 > 주별 말씀 에서 저장한 내용을 그대로 보여줍니다.
+  const verse = useStoredValue('admin-verse', weeklyVerse);
+
   return (
     <PageShell title="주별 말씀" description="한 주의 말씀과 적용 메모를 올립니다.">
       <article className="verse-card">
-        <span>{weeklyVerse.reference}</span>
-        <h2>{weeklyVerse.text}</h2>
-        <p>{weeklyVerse.memo}</p>
+        <span>{verse.reference}</span>
+        <h2>{verse.text}</h2>
+        {verse.memo && <p>{verse.memo}</p>}
+        {verse.updatedAt && (
+          <small className="verse-updated">
+            업데이트 {new Intl.DateTimeFormat('ko-KR', {
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            }).format(new Date(verse.updatedAt))}
+          </small>
+        )}
       </article>
     </PageShell>
   );

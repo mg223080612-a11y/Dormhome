@@ -684,13 +684,15 @@ button.feature-card:hover {
 /* 주별 말씀 */
 .verse-card {
   padding: 1.9rem;
+  border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--dept-ink), #111111);
-  color: #ffffff;
+  background: #ffffff;
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
 }
 
 .verse-card span {
-  opacity: 0.85;
+  color: var(--ink-soft);
   font-weight: 800;
 }
 
@@ -1033,6 +1035,40 @@ button.feature-card:hover {
 .admin-verse-form textarea {
   min-height: 5rem;
   resize: vertical;
+}
+
+.admin-verse-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.admin-verse-actions button[type='submit'] {
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1.1rem;
+  background: #1e293b;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.admin-verse-actions button[type='submit']:hover {
+  background: #334155;
+}
+
+.admin-verse-saved {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #15803d;
+}
+
+.verse-updated {
+  display: block;
+  margin-top: 0.9rem;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
 }
 
 @media (max-width: 600px) {
