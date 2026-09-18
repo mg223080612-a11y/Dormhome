@@ -81,6 +81,11 @@ export const saveVerse = (verse) => apiFetch('/api/verse', { method: 'PUT', body
 export const getMeals = () => apiFetch('/api/meals');
 export const saveMeals = (meals) => apiFetch('/api/meals', { method: 'PUT', body: meals });
 
+export const getEvents = () => apiFetch('/api/events');
+export const addEvent = (event) => apiFetch('/api/events', { method: 'POST', body: event });
+export const removeEvent = (id) =>
+  apiFetch(`/api/events/${encodeURIComponent(id)}`, { method: 'DELETE' });
+
 export const getSurveys = () => apiFetch('/api/surveys');
 export const addSurvey = (survey) => apiFetch('/api/surveys', { method: 'POST', body: survey });
 export const removeSurvey = (id) =>

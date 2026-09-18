@@ -1,12 +1,12 @@
 import { weeklyVerse } from '../data/mockData';
-import useStoredValue from '../utils/useStoredValue';
+import useApiData from '../utils/useApiData';
 
 /**
  * 홈 히어로 — SOS 배너 이미지 한 장 + 그 아래 이번 주 말씀.
  * (말씀은 관리자 > 주별 말씀 에서 수정하면 바로 반영됩니다)
  */
 export default function HomeHero({ onNavigate }) {
-  const verse = useStoredValue('admin-verse', weeklyVerse);
+  const { data: verse } = useApiData('/api/verse', weeklyVerse);
 
   return (
     <section className="home-hero">

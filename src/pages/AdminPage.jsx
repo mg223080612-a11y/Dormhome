@@ -1,16 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PageShell from '../components/PageShell';
 import {
-  PLEDGE_STORAGE_KEY,
   academicEvents as defaultEvents,
   getPledgeDepartment,
   pledgeDepartments,
   pledges as defaultPledges,
-  surveys as defaultSurveys,
   weeklyMeals as defaultMeals,
   weeklyVerse as defaultVerse,
 } from '../data/mockData';
+import {
+  addEvent,
+  addPledge,
+  addSurvey,
+  removeEvent,
+  removePledge,
+  removeSurvey,
+  replacePledges,
+  saveMeals,
+  saveVerse,
+  setPledgeDone
+} from '../utils/api';
 import { readStorage, writeStorage } from '../utils/storage';
+import useApiData from '../utils/useApiData';
 
 const TABS = [
   { id: 'events', label: '일정 관리' },
@@ -24,22 +35,49 @@ const TABS = [
 ];
 
 function AdminEvents() {
-  const [items, setItems] = useState(() => readStorage('admin-events', defaultEvents));
+  const { data: items, setData: setItems, loading, error, reload } = useApiData(
+    '/api/events',
+    defaultEvents
+  );
   const [form, setForm] = useState({ title: '', date: '', type: 'event', dept: '학생회' });
+  const [saveError, setSaveError] = useState(null);
 
-  const save = (next) => { writeStorage('admin-events', next); setItems(next); };
-
-  const add = (e) => {
+  const add = async (e) => {
     e.preventDefault();
     if (!form.title || !form.date) return;
-    save([...items, { id: Date.now(), ...form }]);
-    setForm({ title: '', date: '', type: 'event', dept: '학생회' });
+    setSaveError(null);
+    try {
+      const created = await addEvent(form);
+      setItems([...items, created].sort((a, b) => a.date.localeCompare(b.date)));
+      setForm({ title: '', date: '', type: 'event', dept: '학생회' });
+    } catch (err) {
+      setSaveError(err.message || '추가에 실패했습니다.');
+    }
   };
 
-  const remove = (id) => save(items.filter((i) => i.id !== id));
+  const remove = async (id) => {
+    const previous = items;
+    setSaveError(null);
+    setItems(items.filter((i) => i.id !== id));
+    try {
+      await removeEvent(id);
+    } catch (err) {
+      setItems(previous);
+      setSaveError(err.message || '삭제에 실패했습니다.');
+    }
+  };
 
   return (
     <>
+      {loading && <p className="admin-note">불러오는 중…</p>}
+      {error && (
+        <p className="admin-error">
+          일정을 불러오지 못했습니다.{' '}
+          <button type="button" className="admin-retry" onClick={reload}>다시 시도</button>
+        </p>
+      )}
+      {saveError && <p className="admin-error">{saveError}</p>}
+
       <form className="admin-form" onSubmit={add}>
         <input placeholder="일정 제목" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
         <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
@@ -69,6 +107,9 @@ function AdminEvents() {
               <td><button type="button" className="admin-del" onClick={() => remove(item.id)}>삭제</button></td>
             </tr>
           ))}
+          {items.length === 0 && !loading && (
+            <tr><td colSpan={5} className="admin-empty">등록된 일정이 없습니다.</td></tr>
+          )}
         </tbody>
       </table>
     </>
@@ -76,28 +117,63 @@ function AdminEvents() {
 }
 
 function AdminPledges() {
-  const [items, setItems] = useState(() => readStorage(PLEDGE_STORAGE_KEY, defaultPledges));
+  const { data: items, setData: setItems, loading, error, reload } = useApiData(
+    '/api/pledges',
+    defaultPledges
+  );
   const [deptId, setDeptId] = useState(pledgeDepartments[0].id);
   const [title, setTitle] = useState('');
+  const [saveError, setSaveError] = useState(null);
 
-  const save = (next) => { writeStorage(PLEDGE_STORAGE_KEY, next); setItems(next); };
-
-  const add = (e) => {
-    e.preventDefault();
-    if (!title.trim()) return;
-    save([...items, { id: `${deptId}-${Date.now()}`, dept: deptId, title: title.trim(), done: false }]);
-    setTitle('');
+  // 저장이 실패하면 화면을 되돌려야 하므로, 바꾸기 전 상태를 들고 시도합니다.
+  const run = async (optimistic, action) => {
+    const previous = items;
+    setSaveError(null);
+    setItems(optimistic);
+    try {
+      await action();
+    } catch (err) {
+      setItems(previous); // 실패하면 원래대로
+      setSaveError(err.message || '저장에 실패했습니다.');
+    }
   };
 
-  // 체크박스 하나를 켜고 끕니다. 저장하면 공약 이행도 페이지에 바로 반영됩니다.
-  const toggle = (id) => save(items.map((i) => (i.id === id ? { ...i, done: !i.done } : i)));
+  const toggle = (item) =>
+    run(
+      items.map((i) => (i.id === item.id ? { ...i, done: !i.done } : i)),
+      () => setPledgeDone(item.id, !item.done)
+    );
 
-  const remove = (id) => save(items.filter((i) => i.id !== id));
+  const remove = (item) =>
+    run(
+      items.filter((i) => i.id !== item.id),
+      () => removePledge(item.id)
+    );
+
+  const add = async (e) => {
+    e.preventDefault();
+    const name = title.trim();
+    if (!name) return;
+    setSaveError(null);
+    try {
+      const created = await addPledge({ dept: deptId, title: name, done: false });
+      setItems([...items, created]);
+      setTitle('');
+    } catch (err) {
+      setSaveError(err.message || '추가에 실패했습니다.');
+    }
+  };
 
   // 코드에 적힌 기본 공약 목록으로 되돌립니다. (체크는 모두 해제)
-  const resetToDefault = () => {
+  const resetToDefault = async () => {
     if (!window.confirm('기본 공약 목록으로 되돌립니다. 체크한 이행 상태가 모두 사라집니다. 계속할까요?')) return;
-    save(defaultPledges);
+    setSaveError(null);
+    try {
+      const next = await replacePledges(defaultPledges);
+      setItems(next);
+    } catch (err) {
+      setSaveError(err.message || '되돌리기에 실패했습니다.');
+    }
   };
 
   const shown = items.filter((item) => item.dept === deptId);
@@ -106,6 +182,15 @@ function AdminPledges() {
 
   return (
     <>
+      {loading && <p className="admin-note">불러오는 중…</p>}
+      {error && (
+        <p className="admin-error">
+          공약을 불러오지 못해 기본 목록을 보여주고 있습니다. 이 상태에서는 저장이 안 됩니다.{' '}
+          <button type="button" className="admin-retry" onClick={reload}>다시 시도</button>
+        </p>
+      )}
+      {saveError && <p className="admin-error">{saveError}</p>}
+
       {/* 부서 선택 — 공약이 많아 부서별로 나눠서 편집합니다. */}
       <div className="admin-tabs">
         {pledgeDepartments.map((dept) => {
@@ -143,12 +228,12 @@ function AdminPledges() {
                 <input
                   type="checkbox"
                   checked={Boolean(item.done)}
-                  onChange={() => toggle(item.id)}
+                  onChange={() => toggle(item)}
                   aria-label={`${item.title} 이행 완료`}
                 />
               </td>
               <td>{item.title}</td>
-              <td><button type="button" className="admin-del" onClick={() => remove(item.id)}>삭제</button></td>
+              <td><button type="button" className="admin-del" onClick={() => remove(item)}>삭제</button></td>
             </tr>
           ))}
           {shown.length === 0 && (
@@ -161,22 +246,46 @@ function AdminPledges() {
 }
 
 function AdminSurveys() {
-  const [items, setItems] = useState(() => readStorage('admin-surveys', defaultSurveys));
+  const { data: items, setData: setItems, loading, error, reload } = useApiData('/api/surveys', []);
   const [form, setForm] = useState({ title: '', description: '', url: '', due: '', owner: '학생회' });
+  const [saveError, setSaveError] = useState(null);
 
-  const save = (next) => { writeStorage('admin-surveys', next); setItems(next); };
-
-  const add = (e) => {
+  const add = async (e) => {
     e.preventDefault();
     if (!form.title || !form.url) return;
-    save([...items, { id: Date.now(), ...form }]);
-    setForm({ title: '', description: '', url: '', due: '', owner: '학생회' });
+    setSaveError(null);
+    try {
+      const created = await addSurvey(form);
+      setItems([created, ...items]);
+      setForm({ title: '', description: '', url: '', due: '', owner: '학생회' });
+    } catch (err) {
+      setSaveError(err.message || '추가에 실패했습니다.');
+    }
   };
 
-  const remove = (id) => save(items.filter((i) => i.id !== id));
+  const remove = async (id) => {
+    const previous = items;
+    setSaveError(null);
+    setItems(items.filter((i) => i.id !== id));
+    try {
+      await removeSurvey(id);
+    } catch (err) {
+      setItems(previous);
+      setSaveError(err.message || '삭제에 실패했습니다.');
+    }
+  };
 
   return (
     <>
+      {loading && <p className="admin-note">불러오는 중…</p>}
+      {error && (
+        <p className="admin-error">
+          설문을 불러오지 못했습니다.{' '}
+          <button type="button" className="admin-retry" onClick={reload}>다시 시도</button>
+        </p>
+      )}
+      {saveError && <p className="admin-error">{saveError}</p>}
+
       <form className="admin-form" onSubmit={add}>
         <input placeholder="설문 제목" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
         <input placeholder="설명" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
@@ -200,6 +309,9 @@ function AdminSurveys() {
               <td><button type="button" className="admin-del" onClick={() => remove(item.id)}>삭제</button></td>
             </tr>
           ))}
+          {items.length === 0 && !loading && (
+            <tr><td colSpan={4} className="admin-empty">등록된 설문이 없습니다.</td></tr>
+          )}
         </tbody>
       </table>
     </>
@@ -207,59 +319,110 @@ function AdminSurveys() {
 }
 
 function AdminMeals() {
-  const [items, setItems] = useState(() => readStorage('admin-meals', defaultMeals));
+  const { data: items, setData: setItems, loading, error, reload } = useApiData('/api/meals', defaultMeals);
+  const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
-  const save = (next) => { writeStorage('admin-meals', next); setItems(next); };
-
+  // 타이핑할 때마다 저장하지 않고, 저장 버튼을 눌렀을 때 한 번에 보냅니다.
   const update = (index, field, value) => {
-    const next = items.map((item, i) => (i === index ? { ...item, [field]: value } : item));
-    save(next);
+    setItems(items.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+    setSaved(false);
+  };
+
+  const save = async () => {
+    setSaveError(null);
+    try {
+      await saveMeals(items);
+      setSaved(true);
+    } catch (err) {
+      setSaveError(err.message || '저장에 실패했습니다.');
+    }
   };
 
   return (
-    <table className="admin-table">
-      <thead><tr><th>요일</th><th>아침</th><th>점심</th><th>저녁</th></tr></thead>
-      <tbody>
-        {items.map((item, i) => (
-          <tr key={item.day}>
-            <td><strong>{item.day}</strong></td>
-            <td><input value={item.breakfast} onChange={(e) => update(i, 'breakfast', e.target.value)} /></td>
-            <td><input value={item.lunch} onChange={(e) => update(i, 'lunch', e.target.value)} /></td>
-            <td><input value={item.dinner} onChange={(e) => update(i, 'dinner', e.target.value)} /></td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <>
+      {loading && <p className="admin-note">불러오는 중…</p>}
+      {error && (
+        <p className="admin-error">
+          급식표를 불러오지 못했습니다.{' '}
+          <button type="button" className="admin-retry" onClick={reload}>다시 시도</button>
+        </p>
+      )}
+      {saveError && <p className="admin-error">{saveError}</p>}
+
+      <table className="admin-table">
+        <thead><tr><th>요일</th><th>아침</th><th>점심</th><th>저녁</th></tr></thead>
+        <tbody>
+          {items.map((item, i) => (
+            <tr key={item.day}>
+              <td><strong>{item.day}</strong></td>
+              <td><input value={item.breakfast} onChange={(e) => update(i, 'breakfast', e.target.value)} /></td>
+              <td><input value={item.lunch} onChange={(e) => update(i, 'lunch', e.target.value)} /></td>
+              <td><input value={item.dinner} onChange={(e) => update(i, 'dinner', e.target.value)} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="admin-verse-actions">
+        <button type="button" onClick={save}>저장</button>
+        {saved && <span className="admin-verse-saved">저장되었습니다 · 홈과 급식 페이지에 반영됨</span>}
+      </div>
+    </>
   );
 }
 
 function AdminVerse() {
-  // 저장 버튼을 눌러야 반영됩니다. 저장하면 '주별 말씀' 페이지에 즉시 표시됩니다.
-  const [draft, setDraft] = useState(() => readStorage('admin-verse', defaultVerse));
+  // 저장 버튼을 눌러야 반영됩니다. 저장하면 홈과 '주별 말씀' 페이지에 즉시 표시됩니다.
+  const { data: loaded, loading, error, reload } = useApiData('/api/verse', defaultVerse);
+  const [draft, setDraft] = useState(defaultVerse);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
+  // 서버에서 값을 받아오면 편집 중이던 내용이 없을 때만 채웁니다.
+  useEffect(() => {
+    if (!loading) setDraft(loaded);
+  }, [loading, loaded]);
 
   const update = (field, value) => {
     setDraft((prev) => ({ ...prev, [field]: value }));
     setSaved(false);
   };
 
-  const save = (event) => {
+  const save = async (event) => {
     event.preventDefault();
-    const next = { ...draft, updatedAt: new Date().toISOString() };
-    writeStorage('admin-verse', next);
-    setDraft(next);
-    setSaved(true);
+    setSaveError(null);
+    try {
+      const next = await saveVerse(draft);
+      setDraft(next);
+      setSaved(true);
+    } catch (err) {
+      setSaveError(err.message || '저장에 실패했습니다.');
+    }
   };
 
-  const reset = () => {
-    const next = { ...defaultVerse, updatedAt: new Date().toISOString() };
-    writeStorage('admin-verse', next);
-    setDraft(next);
-    setSaved(true);
+  const reset = async () => {
+    setSaveError(null);
+    try {
+      const next = await saveVerse(defaultVerse);
+      setDraft(next);
+      setSaved(true);
+    } catch (err) {
+      setSaveError(err.message || '되돌리기에 실패했습니다.');
+    }
   };
 
   return (
     <form className="admin-verse-form" onSubmit={save}>
+      {loading && <p className="admin-note">불러오는 중…</p>}
+      {error && (
+        <p className="admin-error">
+          말씀을 불러오지 못했습니다.{' '}
+          <button type="button" className="admin-retry" onClick={reload}>다시 시도</button>
+        </p>
+      )}
+      {saveError && <p className="admin-error">{saveError}</p>}
+
       <label>
         <span>구절 위치</span>
         <input
@@ -274,13 +437,13 @@ function AdminVerse() {
       </label>
       <label>
         <span>적용 메모</span>
-        <textarea value={draft.memo} onChange={(e) => update('memo', e.target.value)} />
+        <textarea value={draft.memo || ''} onChange={(e) => update('memo', e.target.value)} />
       </label>
 
       <div className="admin-verse-actions">
         <button type="submit">저장</button>
         <button type="button" className="admin-del" onClick={reset}>기본값으로</button>
-        {saved && <span className="admin-verse-saved">저장되었습니다 · 주별 말씀 페이지에 반영됨</span>}
+        {saved && <span className="admin-verse-saved">저장되었습니다 · 홈과 주별 말씀 페이지에 반영됨</span>}
       </div>
     </form>
   );

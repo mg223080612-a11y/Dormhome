@@ -25,6 +25,18 @@ CREATE TABLE IF NOT EXISTS pledges (
 
 CREATE INDEX IF NOT EXISTS idx_pledges_dept ON pledges (dept, sort_order);
 
+-- 달력 일정
+CREATE TABLE IF NOT EXISTS events (
+  id         TEXT PRIMARY KEY,
+  title      TEXT NOT NULL,
+  date       TEXT NOT NULL,          -- YYYY-MM-DD
+  type       TEXT,                   -- event / exam / hearing
+  dept       TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_events_date ON events (date);
+
 -- 설문 링크
 CREATE TABLE IF NOT EXISTS surveys (
   id          TEXT PRIMARY KEY,

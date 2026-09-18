@@ -20,6 +20,9 @@
 //   PUT    /api/pledges           공약 목록 통째로 교체 (관리자 '기본 목록으로')
 //   PATCH  /api/pledges/:id       공약 수정 (이행 여부 등)
 //   DELETE /api/pledges/:id       공약 삭제
+//   GET    /api/events            달력 일정
+//   POST   /api/events            일정 추가
+//   DELETE /api/events/:id        일정 삭제
 //   GET    /api/surveys           설문 목록
 //   POST   /api/surveys           설문 추가
 //   DELETE /api/surveys/:id       설문 삭제
@@ -334,6 +337,41 @@ export async function onRequest(context) {
         await db.prepare('DELETE FROM pledges WHERE id = ?').bind(id).run();
         return json({ ok: true });
       }
+    }
+
+    // ── 달력 일정 ──────────────────────────────────────────
+    if (pathname === '/api/events') {
+      if (method === 'GET') {
+        const { results } = await db
+          .prepare('SELECT id, title, date, type, dept FROM events ORDER BY date')
+          .all();
+        return json(results);
+      }
+
+      if (method === 'POST') {
+        const body = await request.json();
+        if (!body.title || !body.date) return fail('일정 제목과 날짜가 필요합니다.');
+        const item = {
+          id: crypto.randomUUID(),
+          title: String(body.title),
+          date: String(body.date),
+          type: String(body.type || 'event'),
+          dept: String(body.dept || '')
+        };
+        await db
+          .prepare(
+            'INSERT INTO events (id, title, date, type, dept, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+          )
+          .bind(item.id, item.title, item.date, item.type, item.dept, new Date().toISOString())
+          .run();
+        return json(item, 201);
+      }
+    }
+
+    if (pathname.startsWith('/api/events/') && method === 'DELETE') {
+      const id = decodeURIComponent(pathname.slice('/api/events/'.length));
+      await db.prepare('DELETE FROM events WHERE id = ?').bind(id).run();
+      return json({ ok: true });
     }
 
     // ── 설문 ───────────────────────────────────────────────

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import MonthCalendar from '../components/MonthCalendar';
 import PageShell from '../components/PageShell';
 import {
-  PLEDGE_STORAGE_KEY,
   academicEvents,
   events,
   initialMarketItems,
@@ -10,12 +9,11 @@ import {
   pledgeDepartments,
   pledges,
   shortforms,
-  surveys,
   weeklyMeals,
   weeklyVerse
 } from '../data/mockData';
 import { addStorageItem, readStorage, writeStorage } from '../utils/storage';
-import useStoredValue from '../utils/useStoredValue';
+import useApiData from '../utils/useApiData';
 
 const dateLabel = (value) => {
   const date = new Date(`${value}T00:00:00`);
@@ -36,7 +34,8 @@ function EmptyState({ text }) {
 }
 
 export function CalendarPage() {
-  const calEvents = readStorage('admin-events', academicEvents);
+  // 관리자 > 일정 관리에서 등록한 일정을 D1 에서 읽어옵니다.
+  const { data: calEvents } = useApiData('/api/events', academicEvents);
   const upcoming = calEvents
     .filter((e) => daysUntil(e.date) >= 0)
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -75,8 +74,9 @@ const donePercent = (list) =>
 export function PledgePage() {
   // 열려 있는 부서 하나만 펼칩니다. null 이면 모두 접힘.
   const [openDept, setOpenDept] = useState(null);
-  // 관리자 > 공약 관리에서 체크한 값을 바로 반영합니다.
-  const allPledges = useStoredValue(PLEDGE_STORAGE_KEY, pledges);
+  // 관리자가 저장한 이행 여부를 D1 에서 읽어옵니다.
+  // 불러오지 못하면 코드의 기본 목록(전부 미이행)을 보여 줍니다.
+  const { data: allPledges, loading } = useApiData('/api/pledges', pledges);
 
   const totalDone = allPledges.filter((pledge) => pledge.done).length;
   const totalPercent = donePercent(allPledges);
@@ -87,10 +87,10 @@ export function PledgePage() {
       <section className="pledge-total">
         <div className="between">
           <h3>전체 공약 이행도</h3>
-          <strong className="pledge-total-pct">{totalPercent}%</strong>
+          <strong className="pledge-total-pct">{loading ? '…' : `${totalPercent}%`}</strong>
         </div>
         <div className="progress-track">
-          <div className="progress-fill" style={{ width: `${totalPercent}%` }} />
+          <div className="progress-fill" style={{ width: `${loading ? 0 : totalPercent}%` }} />
         </div>
         <small>공약 {allPledges.length}개 중 {totalDone}개 이행</small>
       </section>
@@ -289,10 +289,13 @@ export function SuggestionPage({ session }) {
 }
 
 export function MealPage() {
+  // 관리자 > 급식 관리에서 저장한 표를 D1 에서 읽어옵니다.
+  const { data: meals } = useApiData('/api/meals', weeklyMeals);
+
   return (
     <PageShell title="급식" description="주간 급식표와 희망 메뉴 기능으로 연결합니다.">
       <div className="meal-table">
-        {weeklyMeals.map((meal) => (
+        {meals.map((meal) => (
           <article key={meal.day} className="meal-row">
             <strong>{meal.day}</strong>
             <span>아침: {meal.breakfast}</span>
@@ -306,44 +309,43 @@ export function MealPage() {
 }
 
 export function SurveyPage() {
-  const [surveyItems, setSurveyItems] = useState(() => readStorage('surveys', surveys));
+  // 관리자 > 설문 관리에서 등록한 링크를 D1 에서 읽어옵니다.
+  const { data: surveyItems, loading, reload } = useApiData('/api/surveys', []);
   const [refreshedAt, setRefreshedAt] = useState(new Date());
 
   const refresh = () => {
-    const stored = readStorage('surveys', surveys);
-    setSurveyItems(stored);
-    setRefreshedAt(new Date());
-  };
-
-  const reset = () => {
-    writeStorage('surveys', surveys);
-    setSurveyItems(surveys);
+    reload();
     setRefreshedAt(new Date());
   };
 
   return (
-    <PageShell title="설문조사" description="설문 링크를 버튼 형태로 모아두고 새로고침할 수 있습니다.">
+    <PageShell title="설문조사" description="설문 링크를 버튼 형태로 모아둡니다.">
       <div className="between toolbar">
         <small>마지막 새로고침: {refreshedAt.toLocaleString('ko-KR')}</small>
         <div className="button-row">
           <button type="button" onClick={refresh}>새로고침</button>
-          <button type="button" className="ghost-button" onClick={reset}>기본 링크 복원</button>
         </div>
       </div>
 
-      <div className="list-grid">
-        {surveyItems.map((survey) => (
-          <article key={survey.id} className="simple-card survey-card">
-            <div className="between">
-              <h3>{survey.title}</h3>
-              <span className="badge">{survey.owner}</span>
-            </div>
-            <p>{survey.description}</p>
-            <small>마감: {survey.due}</small>
-            <a href={survey.url} target="_blank" rel="noreferrer" className="link-button">설문 열기</a>
-          </article>
-        ))}
-      </div>
+      {loading ? (
+        <EmptyState text="불러오는 중…" />
+      ) : surveyItems.length === 0 ? (
+        <EmptyState text="등록된 설문이 없습니다. 관리자 페이지에서 추가할 수 있습니다." />
+      ) : (
+        <div className="list-grid">
+          {surveyItems.map((survey) => (
+            <article key={survey.id} className="simple-card survey-card">
+              <div className="between">
+                <h3>{survey.title}</h3>
+                {survey.owner && <span className="badge">{survey.owner}</span>}
+              </div>
+              {survey.description && <p>{survey.description}</p>}
+              {survey.due && <small>마감: {survey.due}</small>}
+              <a href={survey.url} target="_blank" rel="noreferrer" className="link-button">설문 열기</a>
+            </article>
+          ))}
+        </div>
+      )}
     </PageShell>
   );
 }
@@ -393,8 +395,8 @@ export function DormRepairPage({ session }) {
 }
 
 export function VersePage() {
-  // 관리자 페이지 > 주별 말씀 에서 저장한 내용을 그대로 보여줍니다.
-  const verse = useStoredValue('admin-verse', weeklyVerse);
+  // 관리자 페이지 > 주별 말씀 에서 저장한 내용을 D1 에서 읽어옵니다.
+  const { data: verse } = useApiData('/api/verse', weeklyVerse);
 
   return (
     <PageShell title="주별 말씀" description="한 주의 말씀과 적용 메모를 올립니다.">

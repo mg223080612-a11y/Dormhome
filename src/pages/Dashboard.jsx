@@ -1,6 +1,6 @@
 import MonthCalendar from '../components/MonthCalendar';
 import { academicEvents, notices, weeklyMeals } from '../data/mockData';
-import useStoredValue from '../utils/useStoredValue';
+import useApiData from '../utils/useApiData';
 
 const MEAL_PERIOD_LABEL = { breakfast: '아침', lunch: '점심', dinner: '저녁' };
 const WEEKDAY_TO_MEAL_INDEX = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4 }; // 월~금만 급식 제공
@@ -13,8 +13,8 @@ const getMealPeriod = () => {
   return 'dinner';
 };
 
-const getTodayMeal = () => {
-  const meal = weeklyMeals[WEEKDAY_TO_MEAL_INDEX[new Date().getDay()]];
+const getTodayMeal = (meals) => {
+  const meal = meals[WEEKDAY_TO_MEAL_INDEX[new Date().getDay()]];
   return meal || null;
 };
 
@@ -33,11 +33,13 @@ function SectionHead({ title, actionLabel, onAction }) {
 
 export default function Dashboard({ onNavigate }) {
   const mealPeriod = getMealPeriod();
-  const todayMeal = getTodayMeal();
+  // 관리자 > 급식 관리에서 저장한 표를 D1 에서 읽어옵니다.
+  const { data: meals } = useApiData('/api/meals', weeklyMeals);
+  const todayMeal = getTodayMeal(meals);
   const mealText = todayMeal ? todayMeal[mealPeriod] : '주말에는 급식 정보가 없어요';
 
-  // 관리자 > 달력에서 저장한 일정을 그대로 씁니다. (저장하면 홈에 바로 반영)
-  const calEvents = useStoredValue('admin-events', academicEvents);
+  // 관리자 > 일정 관리에서 등록한 일정을 D1 에서 읽어옵니다.
+  const { data: calEvents } = useApiData('/api/events', academicEvents);
 
   return (
     <div className="dashboard">
