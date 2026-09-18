@@ -1,0 +1,20 @@
+# Cloudflare Pages 설정
+# 사이트(dist)와 functions/ 의 API 가 같은 프로젝트로 배포됩니다.
+name = "gvcs-autonomy-homepage"
+compatibility_date = "2026-09-01"
+pages_build_output_dir = "dist"
+
+# D1 데이터베이스
+[[d1_databases]]
+binding = "gvcs_db"
+database_name = "gvcs-db"
+database_id = "cc7d8a2c-67e1-4ce5-80b4-20053830bc3f"
+
+[vars]
+# 로그인 토큰 검증에 쓰는 Firebase 프로젝트 ID
+FIREBASE_PROJECT_ID = "dormhome-1c840"
+# 쓰기 권한을 가진 이메일 도메인
+ALLOWED_DOMAIN = "gvcs-mg.org"
+# 특정 계정만 관리자로 두고 싶을 때 쉼표로 나열합니다.
+# 비워 두면 위 도메인 계정이면 누구나 수정할 수 있습니다.
+ADMIN_EMAILS = ""
