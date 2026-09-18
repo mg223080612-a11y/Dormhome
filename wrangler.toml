@@ -20,4 +20,4 @@ ALLOWED_DOMAIN = "gvcs-mg.org"
 # 이 저장소는 공개라서 이메일이 그대로 노출되기 때문입니다.
 # Cloudflare 시크릿으로 설정하세요:
 #   npx wrangler pages secret put ADMIN_EMAILS --project-name dormhome
-# 설정 전에는 @gvcs-mg.org 계정이면 누구나 수정할 수 있습니다.
+# 설정하기 전에는 아무도 수정할 수 없습니다(fail-closed).

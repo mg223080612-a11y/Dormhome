@@ -4,6 +4,7 @@ import Sidebar from './Sidebar';
 
 export default function Layout({
   session,
+  isAdmin,
   activePage,
   onNavigate,
   onLogout,
@@ -46,6 +47,7 @@ export default function Layout({
       <div className="main-layout">
         <Sidebar
           session={session}
+          isAdmin={isAdmin}
           activePage={activePage}
           onNavigate={navigateAndClose}
           open={menuOpen}

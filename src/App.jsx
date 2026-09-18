@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import DepartmentPage from './pages/DepartmentPage';
 import AdminPage from './pages/AdminPage';
+import useIsAdmin from './utils/useIsAdmin';
 import {
   CalendarPage,
   DormRepairPage,
@@ -56,12 +57,49 @@ function LoginRequired({ feature, onLoginClick }) {
   );
 }
 
+/** 관리자 전용 페이지에 관리자가 아닌 사람이 들어왔을 때 */
+function AdminOnly({ session, checked, onLoginClick }) {
+  if (!session) {
+    return (
+      <section className="page-card">
+        <div className="page-card-head">
+          <h2>로그인이 필요합니다</h2>
+          <p>관리자 페이지는 로그인 후 이용할 수 있습니다.</p>
+        </div>
+        <button type="button" className="link-button" onClick={onLoginClick}>로그인하기</button>
+      </section>
+    );
+  }
+
+  if (!checked) {
+    return (
+      <section className="page-card">
+        <div className="page-card-head">
+          <h2>권한을 확인하는 중입니다…</h2>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="page-card">
+      <div className="page-card-head">
+        <h2>접근 권한이 없습니다</h2>
+        <p>관리자로 등록된 계정만 이용할 수 있습니다. 담당자에게 문의해 주세요.</p>
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
   const [session, setSession] = useState(null);
   const [authReady, setAuthReady] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState('studentCouncil');
   const [activePage, setActivePage] = useState(readPageFromLocation);
   const [showLogin, setShowLogin] = useState(false);
+
+  // 관리자 여부는 서버(/api/me)에 물어봅니다. 이메일 목록은 브라우저로 내려오지 않습니다.
+  const { isAdmin, checked: adminChecked } = useIsAdmin(session);
 
   // Firebase 로그인 상태 구독 (새로고침해도 자동 복구)
   useEffect(() => {
@@ -122,6 +160,7 @@ export default function App() {
     return <Login onLogin={handleLogin} onCancel={() => setShowLogin(false)} />;
   }
 
+  // 관리자 여부는 서버에 물어봅니다. (이메일 목록은 브라우저로 내려오지 않습니다)
   const guard = (node, feature) =>
     session ? node : <LoginRequired feature={feature} onLoginClick={() => setShowLogin(true)} />;
 
@@ -143,12 +182,13 @@ export default function App() {
     market: <MarketPage />,
     sos: <SosPage />,
     sync: <SyncPage />,
-    admin: <AdminPage />
+    admin: isAdmin ? <AdminPage /> : <AdminOnly session={session} checked={adminChecked} onLoginClick={() => setShowLogin(true)} />
   };
 
   return (
     <Layout
       session={session}
+      isAdmin={isAdmin}
       activePage={activePage}
       onNavigate={navigate}
       onLogout={logout}

@@ -53,7 +53,7 @@ function MenuButton({ item, activePage, onNavigate, className = 'side-item' }) {
   );
 }
 
-export default function Sidebar({ session, activePage, onNavigate, open, onClose, onLogout, onLoginClick }) {
+export default function Sidebar({ session, isAdmin, activePage, onNavigate, open, onClose, onLogout, onLoginClick }) {
   // 현재 보고 있는 페이지가 속한 카테고리를 펼쳐 둡니다.
   const [openGroup, setOpenGroup] = useState(() => parentOf(activePage));
 
@@ -136,14 +136,18 @@ export default function Sidebar({ session, activePage, onNavigate, open, onClose
               <button type="button" className="login-trigger" onClick={onLoginClick}>login</button>
             )}
           </div>
-          <button
-            type="button"
-            className={activePage === 'admin' ? 'side-item active' : 'side-item'}
-            onClick={() => onNavigate('admin')}
-          >
-            <span className="side-icon">{ICONS.admin}</span>
-            <span>Admin</span>
-          </button>
+          {/* Admin 은 서버가 관리자로 인정한 계정에게만 보입니다.
+              (실제 차단은 서버가 쓰기 요청마다 다시 검사합니다) */}
+          {isAdmin && (
+            <button
+              type="button"
+              className={activePage === 'admin' ? 'side-item active' : 'side-item'}
+              onClick={() => onNavigate('admin')}
+            >
+              <span className="side-icon">{ICONS.admin}</span>
+              <span>Admin</span>
+            </button>
+          )}
         </div>
       </aside>
     </>

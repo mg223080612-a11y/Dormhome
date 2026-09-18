@@ -10,6 +10,7 @@
 //                ADMIN_EMAILS 가 비어 있으면 아무도 쓸 수 없습니다(fail-closed).
 //
 // 엔드포인트
+//   GET    /api/me                내 권한 (Admin 메뉴 표시 여부)
 //   GET    /api/verse             주별 말씀
 //   PUT    /api/verse             주별 말씀 저장
 //   GET    /api/meals             주간 급식표
@@ -211,6 +212,22 @@ export async function onRequest(context) {
   }
 
   try {
+    // ── 내 권한 확인 ───────────────────────────────────────
+    // 화면에서 'Admin' 메뉴를 보여줄지 판단하는 용도입니다.
+    // 관리자 이메일 목록 자체는 절대 내려보내지 않습니다.
+    if (pathname === '/api/me' && method === 'GET') {
+      const authorization = request.headers.get('Authorization') || '';
+      if (!authorization.trim()) {
+        return json({ authenticated: false, isAdmin: false });
+      }
+      const result = await requireWriter(request, env);
+      if (result.error) {
+        // 401 = 토큰 자체가 무효(로그인 안 된 것과 같음), 403 = 로그인은 했지만 관리자가 아님
+        return json({ authenticated: result.status === 403, isAdmin: false });
+      }
+      return json({ authenticated: true, isAdmin: true, email: result.email });
+    }
+
     // ── 주별 말씀 ──────────────────────────────────────────
     if (pathname === '/api/verse') {
       if (method === 'GET') return json(await readDoc(db, 'verse', null));
