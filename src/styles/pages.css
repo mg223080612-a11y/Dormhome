@@ -124,11 +124,18 @@
   color: var(--ink);
 }
 
-/* 홈 주요 기능 (오늘의 급식 / 최근 설문 / 공약 이행도 / 이벤트) */
+/* 기능 카드 묶음 (설문 / 공약 이행도 / 이벤트 등) */
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
+}
+
+/* 홈의 '오늘의 급식' 처럼 카드가 하나뿐일 때는 한 줄을 다 쓰게 둡니다.
+   아래 반응형 블록의 .feature-grid 규칙보다 뒤에 오지 않으므로
+   클래스를 두 번 겹쳐 특이도를 올려 둡니다. */
+.feature-grid.feature-grid-single {
+  grid-template-columns: 1fr;
 }
 
 .feature-card {
@@ -422,23 +429,6 @@ button.feature-card:hover {
 
 .calendar-nav-btn:hover {
   background: var(--hover, #f2f2f2);
-}
-
-.calendar-today-btn {
-  margin-left: 0.5rem;
-  padding: 0.25rem 0.7rem;
-  border: 1px solid #3b82f6;
-  border-radius: 0.5rem;
-  background: #eff6ff;
-  color: #3b82f6;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.calendar-today-btn:hover {
-  background: #3b82f6;
-  color: #ffffff;
 }
 
 .calendar-title {
