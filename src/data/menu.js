@@ -25,11 +25,8 @@ export const navTree = [
     id: 'survey',
     label: 'Surveys',
     icon: 'survey',
-    children: [
-      { id: 'suggestions', label: '건의함', icon: 'suggestions' },
-      { id: 'cafeteriaWish', label: '희망메뉴/급식', icon: 'cafeteria' },
-      { id: 'storeWish', label: '희망메뉴/매점', icon: 'store' },
-    ],
+    // 하위 메뉴 없음 — 설문조사 페이지 하나만 씁니다.
+    children: [],
   },
   {
     id: 'pledges',

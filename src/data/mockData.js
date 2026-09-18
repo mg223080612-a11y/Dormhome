@@ -95,19 +95,19 @@ export const pledgeDepartments = [
 export const getPledgeDepartment = (id) =>
   pledgeDepartments.find((dept) => dept.id === id) || pledgeDepartments[0];
 
-// 공약 저장 키. 부서별 구조로 바뀌면서 예전 'admin-pledges' 와 형식이 달라져
-// 새 키를 씁니다. (예전 키에 남은 값은 읽지 않습니다)
-export const PLEDGE_STORAGE_KEY = 'admin-pledges-v2';
+// 공약 저장 키. 이행 여부(done) 방식으로 바뀌면서 예전 형식과 달라져 새 키를 씁니다.
+// (예전 'admin-pledges', 'admin-pledges-v2' 에 남은 값은 읽지 않습니다)
+export const PLEDGE_STORAGE_KEY = 'admin-pledges-v3';
 
 // 화면과 관리자에서 함께 쓰는 평평한 목록.
-// id 는 저장된 진행률을 다시 붙이는 기준이라 한 번 정해지면 바뀌면 안 됩니다.
+// 이행 여부는 관리자에서 체크박스로 켜고 끄며, 부서 이행도는 '체크된 수 / 전체 수' 로 계산합니다.
+// id 는 저장된 체크 상태를 다시 붙이는 기준이라 한 번 정해지면 바뀌면 안 됩니다.
 export const pledges = pledgeDepartments.flatMap((dept) =>
   dept.titles.map((title, index) => ({
     id: `${dept.id}-${index + 1}`,
     dept: dept.id,
     title,
-    progress: 0,
-    status: '진행중'
+    done: false
   }))
 );
 

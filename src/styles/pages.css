@@ -1084,78 +1084,191 @@ button.feature-card:hover {
   }
 }
 
-/* ── 공약 이행도: 부서 하위탭 ───────────────────────────── */
-.subtabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.1rem;
-}
 
-.subtab {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  padding: 0.55rem 1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: #ffffff;
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.subtab:hover {
-  background: #f1f5f9;
-  color: var(--ink);
-}
-
-.subtab.active {
-  background: var(--dept-color);
-  border-color: var(--dept-color);
-  color: var(--dept-text);
-}
-
-/* 탭에 붙는 평균 이행도 숫자 */
-.subtab-pct {
-  font-size: 0.8rem;
-  font-weight: 700;
-  opacity: 0.75;
-}
-
-/* 선택한 부서 요약 카드 */
-.dept-summary {
+/* ── 공약 이행도: 부서별 드롭다운 ───────────────────────── */
+.pledge-accordion {
   display: grid;
-  gap: 0.6rem;
+  gap: 0.9rem;
+}
+
+.pledge-dept {
+  display: grid;
+  gap: 0.55rem;
   padding: 1.1rem 1.25rem;
-  margin-bottom: 1.25rem;
   border: 1px solid var(--line);
   border-top: 3px solid var(--dept-color);
   border-radius: var(--radius-md);
   background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 
-.dept-summary h3 {
-  margin: 0;
-  font-size: 1rem;
+.pledge-dept.open {
+  border-color: var(--dept-color);
+  box-shadow: var(--shadow-md);
 }
 
-.dept-summary-pct {
+/* 부서 이름 + 전체 이행도 (누르면 아래 명단이 펼쳐집니다) */
+/* 부서 이름 + 전체 이행도 줄. 부서색으로 채우고 글씨는 흰색.
+   (전역 '.page-card button' 규칙보다 앞서도록 클래스를 겹쳐 특이도를 올립니다) */
+.pledge-dept .pledge-dept-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--dept-color);
+  color: #ffffff;
+  cursor: pointer;
+  text-align: left;
+  transition: filter 0.2s var(--ease);
+}
+
+.pledge-dept .pledge-dept-head:hover {
+  filter: brightness(1.12);
+  transform: none;
+}
+
+.pledge-dept-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* 접힘 상태에서는 오른쪽(›), 펼치면 아래(⌄)를 향합니다. */
+.pledge-caret {
+  display: inline-block;
+  color: var(--ink-soft);
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: transform 0.2s var(--ease);
+}
+
+.pledge-dept.open .pledge-caret {
+  transform: rotate(90deg);
+}
+
+/* 부서 이행도 % — 채운 배경 위 흰 글씨 */
+.pledge-dept-pct {
+  color: #ffffff;
   font-size: 1.35rem;
-  color: var(--dept-ink);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
-.dept-summary small {
+.pledge-caret {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.pledge-dept-note {
   color: var(--ink-soft);
 }
 
-/* 공약 카드 앞 번호 */
+/* 펼쳐진 공약 명단 — 개별 진행률은 표시하지 않고 이름만 나열합니다. */
+.pledge-list {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0.35rem 0 0;
+  padding: 0.6rem 0 0;
+  border-top: 1px dashed var(--line);
+  list-style: none;
+}
+
+.pledge-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+  padding: 0.4rem 0.2rem;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.pledge-list li:hover {
+  background: #f8fafc;
+}
+
+.pledge-list li.done .pledge-title {
+  color: var(--ink-soft);
+}
+
 .pledge-no {
-  display: inline-block;
-  min-width: 1.5rem;
-  margin-right: 0.45rem;
+  flex: 0 0 auto;
+  min-width: 1.6rem;
   color: var(--ink-soft);
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pledge-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pledge-check {
+  flex: 0 0 auto;
+  color: #16a34a;
+  font-weight: 800;
+}
+
+/* ── 관리자: 공약 이행 체크박스 ─────────────────────────── */
+.admin-table .col-check {
+  width: 3.5rem;
+  text-align: center;
+}
+
+.admin-table .col-check input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  cursor: pointer;
+  accent-color: var(--dept-color);
+}
+
+.admin-table tr.row-done td {
+  color: var(--ink-soft);
+}
+
+/* 전체(네 부서 합산) 이행도 — 부서색으로 꽉 채우고 글씨는 흰색 */
+.pledge-total {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 1.25rem;
+  border-radius: var(--radius-md);
+  background: var(--dept-color);
+  color: #ffffff;
+  box-shadow: var(--shadow-md);
+}
+
+.pledge-total h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #ffffff;
+}
+
+.pledge-total-pct {
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 800;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.pledge-total small {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* 채운 카드 안에서는 진행바도 흰 계열로 */
+.pledge-total .progress-track {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.pledge-total .progress-fill {
+  background: #ffffff;
 }

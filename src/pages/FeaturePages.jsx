@@ -5,7 +5,6 @@ import {
   PLEDGE_STORAGE_KEY,
   academicEvents,
   events,
-  getPledgeDepartment,
   initialMarketItems,
   initialTaxiRequests,
   pledgeDepartments,
@@ -69,77 +68,80 @@ export function CalendarPage() {
   );
 }
 
-// 목록의 평균 진행률(소수점 버림). 항목이 없으면 0.
-const averageProgress = (list) =>
-  list.length === 0
-    ? 0
-    : Math.round(list.reduce((sum, item) => sum + (Number(item.progress) || 0), 0) / list.length);
+// 부서 이행도 = 체크된 공약 수 / 전체 공약 수
+const donePercent = (list) =>
+  list.length === 0 ? 0 : Math.round((list.filter((item) => item.done).length / list.length) * 100);
 
 export function PledgePage() {
-  const [deptId, setDeptId] = useState(pledgeDepartments[0].id);
-  // 관리자 > 공약 관리에서 저장한 값을 바로 반영합니다.
+  // 열려 있는 부서 하나만 펼칩니다. null 이면 모두 접힘.
+  const [openDept, setOpenDept] = useState(null);
+  // 관리자 > 공약 관리에서 체크한 값을 바로 반영합니다.
   const allPledges = useStoredValue(PLEDGE_STORAGE_KEY, pledges);
 
-  const current = getPledgeDepartment(deptId);
-  const deptPledges = allPledges.filter((pledge) => pledge.dept === deptId);
-  const deptAverage = averageProgress(deptPledges);
-  const doneCount = deptPledges.filter((pledge) => Number(pledge.progress) >= 100).length;
+  const totalDone = allPledges.filter((pledge) => pledge.done).length;
+  const totalPercent = donePercent(allPledges);
 
   return (
-    <PageShell title="공약 이행도" description="자치부서 공약의 진행률을 부서별로 공개합니다.">
-      {/* 부서 하위탭 — 탭에 해당 부서 평균 이행도를 같이 보여 줍니다. */}
-      <div className="subtabs">
+    <PageShell title="공약 이행도" description="자치부서 공약의 이행도를 부서별로 공개합니다. 부서를 누르면 공약 명단이 펼쳐집니다.">
+      {/* 전체(네 부서 합산) 이행도 */}
+      <section className="pledge-total">
+        <div className="between">
+          <h3>전체 공약 이행도</h3>
+          <strong className="pledge-total-pct">{totalPercent}%</strong>
+        </div>
+        <div className="progress-track">
+          <div className="progress-fill" style={{ width: `${totalPercent}%` }} />
+        </div>
+        <small>공약 {allPledges.length}개 중 {totalDone}개 이행</small>
+      </section>
+
+      <div className="pledge-accordion">
         {pledgeDepartments.map((dept) => {
           const list = allPledges.filter((pledge) => pledge.dept === dept.id);
+          const doneCount = list.filter((pledge) => pledge.done).length;
+          const percent = donePercent(list);
+          const open = openDept === dept.id;
+
           return (
-            <button
-              key={dept.id}
-              type="button"
-              className={dept.id === deptId ? 'subtab active' : 'subtab'}
-              onClick={() => setDeptId(dept.id)}
-            >
-              <span className="subtab-label">{dept.label}</span>
-              <span className="subtab-pct">{averageProgress(list)}%</span>
-            </button>
+            <article key={dept.id} className={open ? 'pledge-dept open' : 'pledge-dept'}>
+              <button
+                type="button"
+                className="pledge-dept-head"
+                aria-expanded={open}
+                onClick={() => setOpenDept(open ? null : dept.id)}
+              >
+                <span className="pledge-dept-name">
+                  <span className="pledge-caret" aria-hidden="true">›</span>
+                  {dept.label}
+                </span>
+                <span className="pledge-dept-pct">{percent}%</span>
+              </button>
+
+              <div className="progress-track">
+                <div className="progress-fill" style={{ width: `${percent}%` }} />
+              </div>
+              <small className="pledge-dept-note">
+                공약 {list.length}개 중 {doneCount}개 이행
+              </small>
+
+              {open &&
+                (list.length === 0 ? (
+                  <EmptyState text="등록된 공약이 없습니다." />
+                ) : (
+                  <ul className="pledge-list">
+                    {list.map((pledge, index) => (
+                      <li key={pledge.id} className={pledge.done ? 'done' : ''}>
+                        <span className="pledge-no">{index + 1}</span>
+                        <span className="pledge-title">{pledge.title}</span>
+                        {pledge.done && <span className="pledge-check" aria-label="이행 완료">✓</span>}
+                      </li>
+                    ))}
+                  </ul>
+                ))}
+            </article>
           );
         })}
       </div>
-
-      {/* 선택한 부서 요약 */}
-      <section className="dept-summary">
-        <div className="between">
-          <h3>{current.label} 이행도</h3>
-          <strong className="dept-summary-pct">{deptAverage}%</strong>
-        </div>
-        <div className="progress-track">
-          <div className="progress-fill" style={{ width: `${deptAverage}%` }} />
-        </div>
-        <small>
-          공약 {deptPledges.length}개 · 완료 {doneCount}개
-        </small>
-      </section>
-
-      {deptPledges.length === 0 ? (
-        <EmptyState text="등록된 공약이 없습니다." />
-      ) : (
-        <div className="list-grid">
-          {deptPledges.map((pledge, index) => (
-            <article key={pledge.id} className="progress-card">
-              <div className="between">
-                <h3>
-                  <span className="pledge-no">{index + 1}</span>
-                  {pledge.title}
-                </h3>
-                <span className="badge">{pledge.status}</span>
-              </div>
-              <div className="progress-track">
-                <div className="progress-fill" style={{ width: `${pledge.progress}%` }} />
-              </div>
-              <strong>{pledge.progress}%</strong>
-            </article>
-          ))}
-        </div>
-      )}
     </PageShell>
   );
 }
