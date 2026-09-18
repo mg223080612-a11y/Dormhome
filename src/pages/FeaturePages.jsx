@@ -9,7 +9,6 @@ import {
   pledgeDepartments,
   pledges,
   shortforms,
-  weeklyMeals,
   weeklyVerse
 } from '../data/mockData';
 import { addStorageItem, readStorage, writeStorage } from '../utils/storage';
@@ -288,22 +287,99 @@ export function SuggestionPage({ session }) {
   );
 }
 
+// 이번 주 월요일(일요일이면 지난 월요일)을 구합니다.
+const mondayOf = (base) => {
+  const date = new Date(base.getFullYear(), base.getMonth(), base.getDate());
+  const shift = (date.getDay() + 6) % 7; // 월=0 … 일=6
+  date.setDate(date.getDate() - shift);
+  return date;
+};
+
+const toDateKey = (date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+const WEEKDAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
+
 export function MealPage() {
-  // 관리자 > 급식 관리에서 저장한 표를 D1 에서 읽어옵니다.
-  const { data: meals } = useApiData('/api/meals', weeklyMeals);
+  // 0 = 이번 주, -1 = 지난 주, 1 = 다음 주
+  const [weekOffset, setWeekOffset] = useState(0);
+
+  const monday = mondayOf(new Date());
+  monday.setDate(monday.getDate() + weekOffset * 7);
+
+  const week = WEEKDAY_LABELS.map((label, index) => {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + index);
+    return { label, date, key: toDateKey(date) };
+  });
+
+  const from = week[0].key;
+  const to = week[6].key;
+  const { data: meals, loading } = useApiData(`/api/meals?from=${from}&to=${to}`, []);
+
+  const byDate = {};
+  meals.forEach((meal) => {
+    byDate[meal.date] = meal;
+  });
+
+  const todayKey = toDateKey(new Date());
+  const hasAny = week.some((day) => {
+    const meal = byDate[day.key];
+    return meal && (meal.breakfast || meal.lunch || meal.dinner);
+  });
 
   return (
-    <PageShell title="급식" description="주간 급식표와 희망 메뉴 기능으로 연결합니다.">
-      <div className="meal-table">
-        {meals.map((meal) => (
-          <article key={meal.day} className="meal-row">
-            <strong>{meal.day}</strong>
-            <span>아침: {meal.breakfast}</span>
-            <span>점심: {meal.lunch}</span>
-            <span>저녁: {meal.dinner}</span>
-          </article>
-        ))}
+    <PageShell title="급식" description="주간 급식표입니다. 월요일부터 일요일까지 보여줍니다.">
+      <div className="between toolbar">
+        <button type="button" className="ghost-button" onClick={() => setWeekOffset(weekOffset - 1)}>‹ 지난 주</button>
+        <strong>
+          {monday.getFullYear()}년 {monday.getMonth() + 1}월 {monday.getDate()}일 주
+          {weekOffset === 0 && ' (이번 주)'}
+        </strong>
+        <button type="button" className="ghost-button" onClick={() => setWeekOffset(weekOffset + 1)}>다음 주 ›</button>
       </div>
+
+      {loading ? (
+        <EmptyState text="불러오는 중…" />
+      ) : !hasAny ? (
+        <EmptyState text="이 주의 급식이 아직 등록되지 않았습니다." />
+      ) : (
+        <div className="meal-week">
+          {week.map((day) => {
+            const meal = byDate[day.key] || {};
+            const isToday = day.key === todayKey;
+            return (
+              <article key={day.key} className={isToday ? 'meal-day today' : 'meal-day'}>
+                <header className="meal-day-head">
+                  <strong>{day.label}</strong>
+                  <small>{day.date.getMonth() + 1}/{day.date.getDate()}</small>
+                  {isToday && <span className="badge">오늘</span>}
+                </header>
+                <div className="meal-day-body">
+                  {[
+                    ['아침', meal.breakfast],
+                    ['점심', meal.lunch],
+                    ['저녁', meal.dinner]
+                  ].map(([label, value]) => (
+                    <div key={label} className="meal-slot">
+                      <span className="meal-slot-label">{label}</span>
+                      {value ? (
+                        <ul>
+                          {value.split('\n').filter(Boolean).map((item, i) => (
+                            <li key={`${label}-${i}`}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="meal-slot-empty">—</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </PageShell>
   );
 }

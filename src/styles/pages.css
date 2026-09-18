@@ -1310,3 +1310,123 @@ button.feature-card:hover {
   background: #b91c1c;
   color: #ffffff;
 }
+
+/* ── 급식: 주간 표(월~일) ───────────────────────────────── */
+.meal-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.meal-day {
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+  padding: 0.8rem 0.7rem;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--dept-color);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.meal-day.today {
+  border-color: var(--dept-color);
+  box-shadow: var(--shadow-md);
+}
+
+.meal-day-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.meal-day-head strong {
+  font-size: 1rem;
+}
+
+.meal-day-head small {
+  color: var(--ink-soft);
+}
+
+.meal-day-body {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.meal-slot-label {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--dept-ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.meal-slot ul {
+  margin: 0;
+  padding-left: 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.meal-slot-empty {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+/* ── 관리자: 급식 붙여넣기 ───────────────────────────────── */
+.admin-meals {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.admin-paste {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.admin-warn-list {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  font-weight: 500;
+}
+
+.admin-meal-table textarea {
+  width: 100%;
+  padding: 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.meal-date-cell {
+  white-space: nowrap;
+}
+
+.meal-date-cell small {
+  margin-left: 0.25rem;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 1180px) {
+  .meal-week {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .meal-week {
+    grid-template-columns: 1fr;
+  }
+}

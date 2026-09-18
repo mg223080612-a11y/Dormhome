@@ -25,6 +25,16 @@ CREATE TABLE IF NOT EXISTS pledges (
 
 CREATE INDEX IF NOT EXISTS idx_pledges_dept ON pledges (dept, sort_order);
 
+-- 급식 (날짜별)
+--   붙여넣은 급식표를 날짜 단위로 저장합니다. 한 칸 안의 여러 메뉴는 줄바꿈으로 구분합니다.
+CREATE TABLE IF NOT EXISTS meals (
+  date       TEXT PRIMARY KEY,      -- YYYY-MM-DD
+  breakfast  TEXT NOT NULL DEFAULT '',
+  lunch      TEXT NOT NULL DEFAULT '',
+  dinner     TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL
+);
+
 -- 달력 일정
 CREATE TABLE IF NOT EXISTS events (
   id         TEXT PRIMARY KEY,
@@ -55,11 +65,6 @@ INSERT OR IGNORE INTO docs (key, data, updated_at) VALUES (
   datetime('now')
 );
 
-INSERT OR IGNORE INTO docs (key, data, updated_at) VALUES (
-  'meals',
-  '[{"day":"월","breakfast":"","lunch":"","dinner":""},{"day":"화","breakfast":"","lunch":"","dinner":""},{"day":"수","breakfast":"","lunch":"","dinner":""},{"day":"목","breakfast":"","lunch":"","dinner":""},{"day":"금","breakfast":"","lunch":"","dinner":""}]',
-  datetime('now')
-);
 
 -- 공약 43건 (src/data/mockData.js 의 pledgeDepartments 와 같은 내용)
 INSERT OR IGNORE INTO pledges (id, dept, title, done, sort_order) VALUES ('planning-1', 'planning', '문경생활 가이드북(MSG)', 0, 0);

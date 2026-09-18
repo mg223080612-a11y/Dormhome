@@ -13,8 +13,8 @@
 //   GET    /api/me                내 권한 (Admin 메뉴 표시 여부)
 //   GET    /api/verse             주별 말씀
 //   PUT    /api/verse             주별 말씀 저장
-//   GET    /api/meals             주간 급식표
-//   PUT    /api/meals             주간 급식표 저장
+//   GET    /api/meals             급식 (날짜별, ?from= &to= 로 기간 지정)
+//   PUT    /api/meals             급식 여러 날짜 한 번에 저장
 //   GET    /api/pledges           공약 목록
 //   POST   /api/pledges           공약 추가
 //   PUT    /api/pledges           공약 목록 통째로 교체 (관리자 '기본 목록으로')
@@ -186,6 +186,16 @@ async function writeDoc(db, key, data, email) {
   return updatedAt;
 }
 
+/** 'YYYY-MM-DD' 형식인지 확인 */
+const DATE_ONLY = /^d{4}-d{2}-d{2}$/;
+
+/** 오늘로부터 n일 뒤(음수면 이전)의 날짜 문자열 */
+const shiftDate = (days) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+};
+
 // D1 은 0/1 로 저장하므로 화면에서 쓰기 좋게 true/false 로 바꿔 줍니다.
 const rowToPledge = (row) => ({
   id: row.id,
@@ -241,14 +251,55 @@ export async function onRequest(context) {
       }
     }
 
-    // ── 주간 급식표 ────────────────────────────────────────
+    // ── 급식 (날짜별) ──────────────────────────────────────
+    //   GET  /api/meals?from=YYYY-MM-DD&to=YYYY-MM-DD
+    //        기간을 주지 않으면 오늘 기준 앞뒤로 조금만 돌려줍니다.
+    //   PUT  /api/meals  [{ date, breakfast, lunch, dinner }, ...]
+    //        붙여넣기로 여러 날짜를 한 번에 저장합니다. 같은 날짜는 덮어씁니다.
     if (pathname === '/api/meals') {
-      if (method === 'GET') return json(await readDoc(db, 'meals', null));
+      if (method === 'GET') {
+        const from = url.searchParams.get('from') || shiftDate(-14);
+        const to = url.searchParams.get('to') || shiftDate(60);
+        const { results } = await db
+          .prepare(
+            'SELECT date, breakfast, lunch, dinner FROM meals WHERE date >= ? AND date <= ? ORDER BY date'
+          )
+          .bind(from, to)
+          .all();
+        return json(results);
+      }
+
       if (method === 'PUT') {
         const body = await request.json();
         if (!Array.isArray(body)) return fail('급식표는 배열이어야 합니다.');
-        await writeDoc(db, 'meals', body, writer.email);
-        return json(body);
+
+        const rows = body.filter((item) => DATE_ONLY.test(String(item?.date || '')));
+        if (rows.length === 0) return fail('저장할 날짜가 없습니다.');
+        if (rows.length !== body.length) {
+          return fail('날짜 형식이 올바르지 않은 항목이 있습니다. (YYYY-MM-DD)');
+        }
+
+        const updatedAt = new Date().toISOString();
+        const statements = rows.map((item) =>
+          db
+            .prepare(
+              `INSERT INTO meals (date, breakfast, lunch, dinner, updated_at)
+               VALUES (?, ?, ?, ?, ?)
+               ON CONFLICT(date) DO UPDATE SET breakfast = excluded.breakfast,
+                                               lunch = excluded.lunch,
+                                               dinner = excluded.dinner,
+                                               updated_at = excluded.updated_at`
+            )
+            .bind(
+              String(item.date),
+              String(item.breakfast || ''),
+              String(item.lunch || ''),
+              String(item.dinner || ''),
+              updatedAt
+            )
+        );
+        await db.batch(statements); // 전부 저장되거나 전부 취소
+        return json({ saved: rows.length });
       }
     }
 

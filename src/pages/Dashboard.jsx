@@ -1,9 +1,13 @@
 import MonthCalendar from '../components/MonthCalendar';
-import { academicEvents, notices, weeklyMeals } from '../data/mockData';
+import { academicEvents, notices } from '../data/mockData';
 import useApiData from '../utils/useApiData';
 
 const MEAL_PERIOD_LABEL = { breakfast: '아침', lunch: '점심', dinner: '저녁' };
-const WEEKDAY_TO_MEAL_INDEX = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4 }; // 월~금만 급식 제공
+
+const todayKey = () => {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
 
 // 현재 시각에 따라 아침/점심/저녁 중 보여줄 급식을 고릅니다.
 const getMealPeriod = () => {
@@ -13,10 +17,6 @@ const getMealPeriod = () => {
   return 'dinner';
 };
 
-const getTodayMeal = (meals) => {
-  const meal = meals[WEEKDAY_TO_MEAL_INDEX[new Date().getDay()]];
-  return meal || null;
-};
 
 function SectionHead({ title, actionLabel, onAction }) {
   return (
@@ -33,10 +33,11 @@ function SectionHead({ title, actionLabel, onAction }) {
 
 export default function Dashboard({ onNavigate }) {
   const mealPeriod = getMealPeriod();
-  // 관리자 > 급식 관리에서 저장한 표를 D1 에서 읽어옵니다.
-  const { data: meals } = useApiData('/api/meals', weeklyMeals);
-  const todayMeal = getTodayMeal(meals);
-  const mealText = todayMeal ? todayMeal[mealPeriod] : '주말에는 급식 정보가 없어요';
+  // 오늘 날짜의 급식만 D1 에서 읽어옵니다.
+  const today = todayKey();
+  const { data: meals } = useApiData(`/api/meals?from=${today}&to=${today}`, []);
+  const todayMeal = meals[0] || null;
+  const mealText = todayMeal?.[mealPeriod] || '오늘 급식 정보가 아직 없어요';
 
   // 관리자 > 일정 관리에서 등록한 일정을 D1 에서 읽어옵니다.
   const { data: calEvents } = useApiData('/api/events', academicEvents);

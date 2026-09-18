@@ -5,7 +5,6 @@ import {
   getPledgeDepartment,
   pledgeDepartments,
   pledges as defaultPledges,
-  weeklyMeals as defaultMeals,
   weeklyVerse as defaultVerse,
 } from '../data/mockData';
 import {
@@ -21,6 +20,7 @@ import {
   setPledgeDone
 } from '../utils/api';
 import { readStorage, writeStorage } from '../utils/storage';
+import parseMealText from '../utils/parseMealText';
 import useApiData from '../utils/useApiData';
 
 const TABS = [
@@ -319,56 +319,120 @@ function AdminSurveys() {
 }
 
 function AdminMeals() {
-  const { data: items, setData: setItems, loading, error, reload } = useApiData('/api/meals', defaultMeals);
-  const [saved, setSaved] = useState(false);
+  const [text, setText] = useState('');
+  const [preview, setPreview] = useState(null); // { days, warnings }
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(null);
   const [saveError, setSaveError] = useState(null);
 
-  // 타이핑할 때마다 저장하지 않고, 저장 버튼을 눌렀을 때 한 번에 보냅니다.
-  const update = (index, field, value) => {
-    setItems(items.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
-    setSaved(false);
+  const analyze = () => {
+    setSaved(null);
+    setSaveError(null);
+    setPreview(parseMealText(text));
+  };
+
+  // 미리보기 표에서 직접 고칠 수 있게 합니다. (자동 배치가 틀렸을 때)
+  const editCell = (date, field, value) => {
+    setPreview((prev) => ({
+      ...prev,
+      days: prev.days.map((day) => (day.date === date ? { ...day, [field]: value } : day))
+    }));
+    setSaved(null);
   };
 
   const save = async () => {
+    if (!preview?.days?.length) return;
+    setSaving(true);
     setSaveError(null);
     try {
-      await saveMeals(items);
-      setSaved(true);
+      const result = await saveMeals(
+        preview.days.map(({ date, breakfast, lunch, dinner }) => ({ date, breakfast, lunch, dinner }))
+      );
+      setSaved(result?.saved ?? preview.days.length);
     } catch (err) {
       setSaveError(err.message || '저장에 실패했습니다.');
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
-    <>
-      {loading && <p className="admin-note">불러오는 중…</p>}
-      {error && (
-        <p className="admin-error">
-          급식표를 불러오지 못했습니다.{' '}
-          <button type="button" className="admin-retry" onClick={reload}>다시 시도</button>
-        </p>
-      )}
-      {saveError && <p className="admin-error">{saveError}</p>}
+    <div className="admin-meals">
+      <p className="admin-note">
+        급식표를 그대로 붙여넣고 <strong>[배치해보기]</strong> 를 누르면 날짜별 아침·점심·저녁으로 나눕니다.
+        아래 표에서 확인하고 고친 뒤 저장하세요.
+      </p>
 
-      <table className="admin-table">
-        <thead><tr><th>요일</th><th>아침</th><th>점심</th><th>저녁</th></tr></thead>
-        <tbody>
-          {items.map((item, i) => (
-            <tr key={item.day}>
-              <td><strong>{item.day}</strong></td>
-              <td><input value={item.breakfast} onChange={(e) => update(i, 'breakfast', e.target.value)} /></td>
-              <td><input value={item.lunch} onChange={(e) => update(i, 'lunch', e.target.value)} /></td>
-              <td><input value={item.dinner} onChange={(e) => update(i, 'dinner', e.target.value)} /></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <textarea
+        className="admin-paste"
+        rows={10}
+        placeholder={'09-14(월)\n계란옷완자전\n쥐어채볶음\n…'}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
 
       <div className="admin-verse-actions">
-        <button type="button" onClick={save}>저장</button>
-        {saved && <span className="admin-verse-saved">저장되었습니다 · 홈과 급식 페이지에 반영됨</span>}
+        <button type="button" onClick={analyze} disabled={!text.trim()}>배치해보기</button>
+        {preview && (
+          <button type="button" className="ghost-button" onClick={() => { setText(''); setPreview(null); setSaved(null); }}>
+            지우기
+          </button>
+        )}
       </div>
-    </>
+
+      {preview?.warnings?.length > 0 && (
+        <div className="admin-error">
+          <div>
+            <strong>확인이 필요합니다</strong>
+            <ul className="admin-warn-list">
+              {preview.warnings.map((warning, i) => <li key={i}>{warning}</li>)}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {saveError && <p className="admin-error">{saveError}</p>}
+
+      {preview && (
+        <>
+          <div className="admin-toolbar">
+            <span>{preview.days.length}일치 · 내용이 있는 날 {preview.days.filter((d) => d.breakfast || d.lunch || d.dinner).length}일</span>
+            <button type="button" onClick={save} disabled={saving}>
+              {saving ? '저장 중…' : `${preview.days.length}일치 저장`}
+            </button>
+          </div>
+
+          {saved !== null && (
+            <p className="admin-verse-saved">{saved}일치가 저장되었습니다 · 홈과 급식 페이지에 반영됨</p>
+          )}
+
+          <table className="admin-table admin-meal-table">
+            <thead>
+              <tr><th>날짜</th><th>아침</th><th>점심</th><th>저녁</th></tr>
+            </thead>
+            <tbody>
+              {preview.days.map((day) => (
+                <tr key={day.date}>
+                  <td className="meal-date-cell">
+                    <strong>{day.date.slice(5)}</strong>
+                    <small>({day.weekday})</small>
+                  </td>
+                  {['breakfast', 'lunch', 'dinner'].map((field) => (
+                    <td key={field}>
+                      <textarea
+                        rows={Math.max(2, (day[field] || '').split('\n').length)}
+                        value={day[field]}
+                        onChange={(e) => editCell(day.date, field, e.target.value)}
+                      />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
   );
 }
 
