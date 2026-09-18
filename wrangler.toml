@@ -1,6 +1,6 @@
 # Cloudflare Pages 설정
 # 사이트(dist)와 functions/ 의 API 가 같은 프로젝트로 배포됩니다.
-name = "gvcs-autonomy-homepage"
+name = "dormhome"
 compatibility_date = "2026-09-01"
 pages_build_output_dir = "dist"
 
@@ -15,6 +15,9 @@ database_id = "cc7d8a2c-67e1-4ce5-80b4-20053830bc3f"
 FIREBASE_PROJECT_ID = "dormhome-1c840"
 # 쓰기 권한을 가진 이메일 도메인
 ALLOWED_DOMAIN = "gvcs-mg.org"
-# 특정 계정만 관리자로 두고 싶을 때 쉼표로 나열합니다.
-# 비워 두면 위 도메인 계정이면 누구나 수정할 수 있습니다.
-ADMIN_EMAILS = ""
+
+# ADMIN_EMAILS (쓰기 권한을 가진 관리자 이메일, 쉼표 구분) 는 여기에 두지 않습니다.
+# 이 저장소는 공개라서 이메일이 그대로 노출되기 때문입니다.
+# Cloudflare 시크릿으로 설정하세요:
+#   npx wrangler pages secret put ADMIN_EMAILS --project-name dormhome
+# 설정 전에는 @gvcs-mg.org 계정이면 누구나 수정할 수 있습니다.

@@ -6,8 +6,8 @@
 //
 // 권한 규칙
 //   읽기(GET)  : 누구나
-//   쓰기(그 외) : Firebase 구글 로그인 토큰이 있고, 이메일이 학교 도메인일 때만.
-//                ADMIN_EMAILS 를 설정하면 그 목록의 계정만 쓸 수 있습니다.
+//   쓰기(그 외) : Firebase 구글 로그인 토큰 + 학교 도메인 + ADMIN_EMAILS 에 등록된 관리자.
+//                ADMIN_EMAILS 가 비어 있으면 아무도 쓸 수 없습니다(fail-closed).
 //
 // 엔드포인트
 //   GET    /api/verse             주별 말씀
@@ -102,7 +102,7 @@ async function verifyIdToken(token, projectId) {
   return payload;
 }
 
-/** 쓰기 권한 확인 — 학교 도메인(+선택적으로 관리자 목록) 계정만 통과 */
+/** 쓰기 권한 확인 — 학교 도메인 + ADMIN_EMAILS 에 등록된 관리자만 통과 */
 async function requireWriter(request, env) {
   const authorization = request.headers.get('Authorization') || '';
   const token = authorization.replace(/^Bearer\s+/i, '').trim();
@@ -126,13 +126,23 @@ async function requireWriter(request, env) {
     return { error: `@${env.ALLOWED_DOMAIN} 계정만 수정할 수 있습니다.`, status: 403 };
   }
 
-  // ADMIN_EMAILS 가 비어 있으면 학교 계정이면 모두 허용,
-  // 값이 있으면 그 목록에 있는 계정만 허용합니다.
+  // 쓰기는 ADMIN_EMAILS 에 등록된 계정만 가능합니다.
+  // 목록이 비어 있으면 '아무도 못 쓴다'로 동작합니다(fail-closed).
+  // 설정이 빠졌을 때 조용히 전체 공개가 되는 쪽이 훨씬 위험하기 때문입니다.
   const admins = String(env.ADMIN_EMAILS || '')
     .split(',')
     .map((value) => value.trim().toLowerCase())
     .filter(Boolean);
-  if (admins.length > 0 && !admins.includes(email)) {
+
+  if (admins.length === 0) {
+    return {
+      error:
+        '관리자 목록(ADMIN_EMAILS)이 설정되지 않아 수정이 잠겨 있습니다. Cloudflare 시크릿을 설정해 주세요.',
+      status: 403
+    };
+  }
+
+  if (!admins.includes(email)) {
     return { error: '관리자로 등록된 계정만 수정할 수 있습니다.', status: 403 };
   }
 
