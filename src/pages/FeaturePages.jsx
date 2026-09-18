@@ -2,10 +2,13 @@ import { useState } from 'react';
 import MonthCalendar from '../components/MonthCalendar';
 import PageShell from '../components/PageShell';
 import {
+  PLEDGE_STORAGE_KEY,
   academicEvents,
   events,
+  getPledgeDepartment,
   initialMarketItems,
   initialTaxiRequests,
+  pledgeDepartments,
   pledges,
   shortforms,
   surveys,
@@ -66,24 +69,77 @@ export function CalendarPage() {
   );
 }
 
+// 목록의 평균 진행률(소수점 버림). 항목이 없으면 0.
+const averageProgress = (list) =>
+  list.length === 0
+    ? 0
+    : Math.round(list.reduce((sum, item) => sum + (Number(item.progress) || 0), 0) / list.length);
+
 export function PledgePage() {
+  const [deptId, setDeptId] = useState(pledgeDepartments[0].id);
+  // 관리자 > 공약 관리에서 저장한 값을 바로 반영합니다.
+  const allPledges = useStoredValue(PLEDGE_STORAGE_KEY, pledges);
+
+  const current = getPledgeDepartment(deptId);
+  const deptPledges = allPledges.filter((pledge) => pledge.dept === deptId);
+  const deptAverage = averageProgress(deptPledges);
+  const doneCount = deptPledges.filter((pledge) => Number(pledge.progress) >= 100).length;
+
   return (
-    <PageShell title="공약 이행도" description="학생회와 자치부서 공약의 진행률을 공개합니다.">
-      <div className="list-grid">
-        {pledges.map((pledge) => (
-          <article key={pledge.id} className="progress-card">
-            <div className="between">
-              <h3>{pledge.title}</h3>
-              <span className="badge">{pledge.status}</span>
-            </div>
-            <p>{pledge.owner}</p>
-            <div className="progress-track">
-              <div className="progress-fill" style={{ width: `${pledge.progress}%` }} />
-            </div>
-            <strong>{pledge.progress}%</strong>
-          </article>
-        ))}
+    <PageShell title="공약 이행도" description="자치부서 공약의 진행률을 부서별로 공개합니다.">
+      {/* 부서 하위탭 — 탭에 해당 부서 평균 이행도를 같이 보여 줍니다. */}
+      <div className="subtabs">
+        {pledgeDepartments.map((dept) => {
+          const list = allPledges.filter((pledge) => pledge.dept === dept.id);
+          return (
+            <button
+              key={dept.id}
+              type="button"
+              className={dept.id === deptId ? 'subtab active' : 'subtab'}
+              onClick={() => setDeptId(dept.id)}
+            >
+              <span className="subtab-label">{dept.label}</span>
+              <span className="subtab-pct">{averageProgress(list)}%</span>
+            </button>
+          );
+        })}
       </div>
+
+      {/* 선택한 부서 요약 */}
+      <section className="dept-summary">
+        <div className="between">
+          <h3>{current.label} 이행도</h3>
+          <strong className="dept-summary-pct">{deptAverage}%</strong>
+        </div>
+        <div className="progress-track">
+          <div className="progress-fill" style={{ width: `${deptAverage}%` }} />
+        </div>
+        <small>
+          공약 {deptPledges.length}개 · 완료 {doneCount}개
+        </small>
+      </section>
+
+      {deptPledges.length === 0 ? (
+        <EmptyState text="등록된 공약이 없습니다." />
+      ) : (
+        <div className="list-grid">
+          {deptPledges.map((pledge, index) => (
+            <article key={pledge.id} className="progress-card">
+              <div className="between">
+                <h3>
+                  <span className="pledge-no">{index + 1}</span>
+                  {pledge.title}
+                </h3>
+                <span className="badge">{pledge.status}</span>
+              </div>
+              <div className="progress-track">
+                <div className="progress-fill" style={{ width: `${pledge.progress}%` }} />
+              </div>
+              <strong>{pledge.progress}%</strong>
+            </article>
+          ))}
+        </div>
+      )}
     </PageShell>
   );
 }

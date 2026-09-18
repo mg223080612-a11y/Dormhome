@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import PageShell from '../components/PageShell';
 import {
+  PLEDGE_STORAGE_KEY,
   academicEvents as defaultEvents,
+  getPledgeDepartment,
+  pledgeDepartments,
   pledges as defaultPledges,
   surveys as defaultSurveys,
   weeklyMeals as defaultMeals,
@@ -73,59 +76,93 @@ function AdminEvents() {
 }
 
 function AdminPledges() {
-  const [items, setItems] = useState(() => readStorage('admin-pledges', defaultPledges));
-  const [form, setForm] = useState({ title: '', progress: 0, owner: '학생회', status: '진행중' });
+  const [items, setItems] = useState(() => readStorage(PLEDGE_STORAGE_KEY, defaultPledges));
+  const [deptId, setDeptId] = useState(pledgeDepartments[0].id);
+  const [form, setForm] = useState({ title: '', progress: 0, status: '진행중' });
 
-  const save = (next) => { writeStorage('admin-pledges', next); setItems(next); };
+  const save = (next) => { writeStorage(PLEDGE_STORAGE_KEY, next); setItems(next); };
 
   const add = (e) => {
     e.preventDefault();
     if (!form.title) return;
-    save([...items, { id: Date.now(), ...form, progress: Number(form.progress) }]);
-    setForm({ title: '', progress: 0, owner: '학생회', status: '진행중' });
+    save([
+      ...items,
+      { id: `${deptId}-${Date.now()}`, dept: deptId, ...form, progress: Number(form.progress) }
+    ]);
+    setForm({ title: '', progress: 0, status: '진행중' });
   };
 
-  const updateProgress = (id, progress) => {
-    save(items.map((i) => (i.id === id ? { ...i, progress: Number(progress) } : i)));
+  const update = (id, field, value) => {
+    save(items.map((i) => (i.id === id ? { ...i, [field]: value } : i)));
   };
 
   const remove = (id) => save(items.filter((i) => i.id !== id));
 
+  // 코드에 적힌 기본 공약 목록으로 되돌립니다. (진행률은 모두 0 으로 초기화)
+  const resetToDefault = () => {
+    if (!window.confirm('기본 공약 목록으로 되돌립니다. 저장된 진행률이 모두 사라집니다. 계속할까요?')) return;
+    save(defaultPledges);
+  };
+
+  const shown = items.filter((item) => item.dept === deptId);
+
   return (
     <>
+      {/* 부서 선택 — 공약이 많아 부서별로 나눠서 편집합니다. */}
+      <div className="admin-tabs">
+        {pledgeDepartments.map((dept) => (
+          <button
+            key={dept.id}
+            type="button"
+            className={dept.id === deptId ? 'admin-tab active' : 'admin-tab'}
+            onClick={() => setDeptId(dept.id)}
+          >
+            {dept.label} ({items.filter((i) => i.dept === dept.id).length})
+          </button>
+        ))}
+      </div>
+
       <form className="admin-form" onSubmit={add}>
         <input placeholder="공약 제목" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
         <input type="number" min="0" max="100" placeholder="진행률" value={form.progress} onChange={(e) => setForm({ ...form, progress: e.target.value })} />
-        <select value={form.owner} onChange={(e) => setForm({ ...form, owner: e.target.value })}>
-          <option>학생회</option>
-          <option>자치위원</option>
-          <option>홍보대사</option>
-          <option>자치법정</option>
-          <option>GMB</option>
-        </select>
         <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
           <option>진행중</option>
           <option>검토중</option>
           <option>완료</option>
           <option>보류</option>
         </select>
-        <button type="submit">추가</button>
+        <button type="submit">{getPledgeDepartment(deptId).label}에 추가</button>
       </form>
+
+      <div className="admin-toolbar">
+        <span>{shown.length}건</span>
+        <button type="button" className="admin-del" onClick={resetToDefault}>기본 목록으로</button>
+      </div>
+
       <table className="admin-table">
-        <thead><tr><th>제목</th><th>진행률</th><th>담당</th><th>상태</th><th></th></tr></thead>
+        <thead><tr><th>제목</th><th>진행률</th><th>상태</th><th></th></tr></thead>
         <tbody>
-          {items.map((item) => (
+          {shown.map((item) => (
             <tr key={item.id}>
               <td>{item.title}</td>
               <td>
-                <input type="range" min="0" max="100" value={item.progress} onChange={(e) => updateProgress(item.id, e.target.value)} />
+                <input type="range" min="0" max="100" value={item.progress} onChange={(e) => update(item.id, 'progress', Number(e.target.value))} />
                 <span>{item.progress}%</span>
               </td>
-              <td>{item.owner}</td>
-              <td>{item.status}</td>
+              <td>
+                <select value={item.status} onChange={(e) => update(item.id, 'status', e.target.value)}>
+                  <option>진행중</option>
+                  <option>검토중</option>
+                  <option>완료</option>
+                  <option>보류</option>
+                </select>
+              </td>
               <td><button type="button" className="admin-del" onClick={() => remove(item.id)}>삭제</button></td>
             </tr>
           ))}
+          {shown.length === 0 && (
+            <tr><td colSpan={4} className="admin-empty">이 부서에 등록된 공약이 없습니다.</td></tr>
+          )}
         </tbody>
       </table>
     </>

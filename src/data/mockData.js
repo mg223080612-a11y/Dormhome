@@ -19,13 +19,97 @@ export const galleryPhotos = [
 
 export const academicEvents = [];
 
-export const pledges = [
-  { id: 1, title: '생활관 스케줄표 온라인 공개', progress: 80, owner: '자치위원', status: '진행중' },
-  { id: 2, title: '급식 희망 메뉴 투표 정례화', progress: 45, owner: '학생회', status: '진행중' },
-  { id: 3, title: '학생 건의함 답변 주간 리포트', progress: 65, owner: '학생회', status: '검토중' },
-  { id: 4, title: '학교 행사 사진첩 정리', progress: 70, owner: '홍보대사', status: '진행중' },
-  { id: 5, title: '상점·벌점 기준 카드뉴스 제작', progress: 55, owner: '자치법정', status: '진행중' }
+// ── 공약 ──────────────────────────────────────────────────
+// 공약은 부서별로 묶여 있고, '공약 이행도' 페이지에서 부서 하위탭으로 나눠 봅니다.
+// 진행률(progress)은 여기서 0 으로 시작하고 관리자 > 공약 관리에서 조정합니다.
+export const pledgeDepartments = [
+  {
+    id: 'planning',
+    label: '기획부',
+    titles: [
+      '문경생활 가이드북(MSG)',
+      'SBS 생활관 방송',
+      '희망 메뉴',
+      '라면데이',
+      '층별자치활동',
+      '계절별 생일케이크',
+      '눈이 오잖아',
+      '휴지 쟁탈전'
+    ]
+  },
+  {
+    id: 'welfare',
+    label: '복지부',
+    titles: [
+      '토요일 1시 인원점검',
+      '샤워기 해바라기 필터 설치',
+      '카페 화장실 활성화',
+      '발수건 설치',
+      '제습제 설치',
+      '주말 아침 상점 부활',
+      '공용우산 배치',
+      '우천시 우산탈수기·신발 매트 배치',
+      '식당 앞 세면대 가글 배치',
+      '각 기숙사 1층 택배함·반품함 설치',
+      '식당 음료수컵 변경',
+      '고사기간 간식 day',
+      '청매 B파트 쓰레기통 설치',
+      '일반간식 메뉴 다양화',
+      '무선 청소기 배치',
+      '아이스크림 자판기',
+      '급식실 TV 활성화',
+      '도어후크 설치',
+      '자치위원 복지 공약',
+      '의료비품 배치',
+      '주말 TV 채널 시간표 제작'
+    ]
+  },
+  {
+    id: 'faith',
+    label: '영성학술부',
+    titles: [
+      '저녁시간 기도회',
+      '아침찬양·청소찬양 신청곡',
+      '야외 금찬',
+      '자치위원 불평팔찌',
+      '선택적 야간 주말 자습',
+      '고사기간 프린터기 예약제',
+      '고사기간 카페 노트북 사용'
+    ]
+  },
+  {
+    id: 'promotion',
+    label: '홍보예체능부',
+    titles: [
+      '방별 숏폼 콘테스트',
+      '지비 폴라로이드',
+      '배달음식 메뉴판 업데이트·다양화',
+      '축구부 원정 경기 직관',
+      '헬스장 필요 도구 추가',
+      '아이싱 비닐봉지 배치',
+      '출사동이 공기주입기 배치'
+    ]
+  }
 ];
+
+export const getPledgeDepartment = (id) =>
+  pledgeDepartments.find((dept) => dept.id === id) || pledgeDepartments[0];
+
+// 공약 저장 키. 부서별 구조로 바뀌면서 예전 'admin-pledges' 와 형식이 달라져
+// 새 키를 씁니다. (예전 키에 남은 값은 읽지 않습니다)
+export const PLEDGE_STORAGE_KEY = 'admin-pledges-v2';
+
+// 화면과 관리자에서 함께 쓰는 평평한 목록.
+// id 는 저장된 진행률을 다시 붙이는 기준이라 한 번 정해지면 바뀌면 안 됩니다.
+export const pledges = pledgeDepartments.flatMap((dept) =>
+  dept.titles.map((title, index) => ({
+    id: `${dept.id}-${index + 1}`,
+    dept: dept.id,
+    title,
+    progress: 0,
+    status: '진행중'
+  }))
+);
 
 export const surveys = [
   {

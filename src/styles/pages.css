@@ -1083,3 +1083,79 @@ button.feature-card:hover {
     flex-direction: column;
   }
 }
+
+/* ── 공약 이행도: 부서 하위탭 ───────────────────────────── */
+.subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+
+.subtab {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.subtab:hover {
+  background: #f1f5f9;
+  color: var(--ink);
+}
+
+.subtab.active {
+  background: var(--dept-color);
+  border-color: var(--dept-color);
+  color: var(--dept-text);
+}
+
+/* 탭에 붙는 평균 이행도 숫자 */
+.subtab-pct {
+  font-size: 0.8rem;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+/* 선택한 부서 요약 카드 */
+.dept-summary {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--dept-color);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.dept-summary h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.dept-summary-pct {
+  font-size: 1.35rem;
+  color: var(--dept-ink);
+}
+
+.dept-summary small {
+  color: var(--ink-soft);
+}
+
+/* 공약 카드 앞 번호 */
+.pledge-no {
+  display: inline-block;
+  min-width: 1.5rem;
+  margin-right: 0.45rem;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
