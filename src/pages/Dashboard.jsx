@@ -49,7 +49,12 @@ export default function Dashboard({ onNavigate }) {
         <div className="feature-grid feature-grid-single">
           <button type="button" className="feature-card" onClick={() => onNavigate('meal')}>
             <span className="feature-label">오늘의 급식 · {MEAL_PERIOD_LABEL[mealPeriod]}</span>
-            <strong className="feature-value">{mealText}</strong>
+            {/* 메뉴가 줄바꿈으로 저장돼 있어 한 줄씩 나눠 보여줍니다. */}
+            <strong className="feature-value meal-today-list">
+              {mealText.split('\n').map((line, index) =>
+                line ? <span key={index}>{line}</span> : null
+              )}
+            </strong>
           </button>
         </div>
       </section>

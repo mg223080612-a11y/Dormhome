@@ -79,6 +79,15 @@ const guessYear = (month, day, weekdayLabel) => {
   return { year: thisYear, matched: false };
 };
 
+/** 앞뒤의 빈 줄만 잘라냅니다. 가운데 빈 줄은 구분선이라 남깁니다. */
+const trimBlank = (lines) => {
+  let start = 0;
+  let end = lines.length;
+  while (start < end && !lines[start]) start += 1;
+  while (end > start && !lines[end - 1]) end -= 1;
+  return lines.slice(start, end).join('\n');
+};
+
 const pad = (n) => String(n).padStart(2, '0');
 
 /**
@@ -110,7 +119,10 @@ export default function parseMealText(text) {
       chunks.push(current);
       return;
     }
-    if (current && line) current.body.push(line);
+    // 빈 줄도 그대로 둡니다. 점심 칸에서 일품과 일반 세트를 갈라 주는
+    // 구분선 역할을 하고 있어서, 버리면 화면에서 둘이 붙어 버립니다.
+    // (앞뒤로 남는 빈 줄은 아래 trimBlank 에서 정리합니다)
+    if (current) current.body.push(line);
   });
 
   if (chunks.length === 0) {
@@ -133,7 +145,8 @@ export default function parseMealText(text) {
     const body = chunk.body;
 
     const empty = { date, weekday: chunk.weekday, breakfast: '', lunch: '', dinner: '' };
-    if (body.length === 0) return empty;
+    // 빈 줄만 있는 날(급식 없는 날)도 빈 날로 봅니다.
+    if (body.every((line) => !line)) return empty;
 
     const breakfastEnd = body.findIndex((line) => line.includes(BREAKFAST_END));
 
@@ -142,7 +155,7 @@ export default function parseMealText(text) {
       warnings.push(
         `${date}(${chunk.weekday}): '${BREAKFAST_END}' 표시가 없어 전부 저녁으로 넣었습니다. 아래 표에서 직접 옮겨 주세요.`
       );
-      return { ...empty, dinner: body.join('\n') };
+      return { ...empty, dinner: trimBlank(body) };
     }
 
     const breakfast = body.slice(0, breakfastEnd + 1);
@@ -156,8 +169,8 @@ export default function parseMealText(text) {
       );
       return {
         ...empty,
-        breakfast: breakfast.join('\n'),
-        lunch: rest.join('\n')
+        breakfast: trimBlank(breakfast),
+        lunch: trimBlank(rest)
       };
     }
 
@@ -169,9 +182,9 @@ export default function parseMealText(text) {
     return {
       date,
       weekday: chunk.weekday,
-      breakfast: breakfast.join('\n'),
-      lunch: lunch.join('\n'),
-      dinner: dinner.join('\n')
+      breakfast: trimBlank(breakfast),
+      lunch: trimBlank(lunch),
+      dinner: trimBlank(dinner)
     };
   });
 

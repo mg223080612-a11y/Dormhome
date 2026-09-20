@@ -12,7 +12,6 @@
 .progress-card,
 .countdown-card,
 .notice-item,
-.meal-row,
 .timeline-item {
   border: 1px solid var(--line);
   border-top: 3px solid var(--dept-color);
@@ -613,24 +612,6 @@ button.feature-card:hover {
   min-height: 7rem;
   padding-top: 0.85rem;
   resize: vertical;
-}
-
-/* 급식표 */
-.meal-table {
-  display: grid;
-  gap: 0.7rem;
-}
-
-.meal-row {
-  display: grid;
-  grid-template-columns: 4rem repeat(3, 1fr);
-  gap: 0.75rem;
-  align-items: center;
-  padding: 1.1rem;
-}
-
-.meal-row strong {
-  color: var(--dept-ink);
 }
 
 .survey-card .link-button {
@@ -1311,72 +1292,6 @@ button.feature-card:hover {
   color: #ffffff;
 }
 
-/* ── 급식: 주간 표(월~일) ───────────────────────────────── */
-.meal-week {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.7rem;
-}
-
-.meal-day {
-  display: grid;
-  align-content: start;
-  gap: 0.6rem;
-  padding: 0.8rem 0.7rem;
-  border: 1px solid var(--line);
-  border-top: 3px solid var(--dept-color);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-}
-
-.meal-day.today {
-  border-color: var(--dept-color);
-  box-shadow: var(--shadow-md);
-}
-
-.meal-day-head {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--line);
-}
-
-.meal-day-head strong {
-  font-size: 1rem;
-}
-
-.meal-day-head small {
-  color: var(--ink-soft);
-}
-
-.meal-day-body {
-  display: grid;
-  gap: 0.6rem;
-}
-
-.meal-slot-label {
-  display: block;
-  margin-bottom: 0.2rem;
-  color: var(--dept-ink);
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-.meal-slot ul {
-  margin: 0;
-  padding-left: 0.9rem;
-  font-size: 0.85rem;
-  line-height: 1.5;
-}
-
-.meal-slot-empty {
-  margin: 0;
-  color: var(--ink-soft);
-}
-
 /* ── 관리자: 급식 붙여넣기 ───────────────────────────────── */
 .admin-meals {
   display: grid;
@@ -1429,4 +1344,172 @@ button.feature-card:hover {
   .meal-week {
     grid-template-columns: 1fr;
   }
+}
+
+/* ── 급식: 주간 표(행=날짜, 열=아침/점심/저녁) ───────────── */
+/* 좁은 화면에서는 표가 화면보다 넓어질 수 있어 가로로만 스크롤합니다. */
+.meal-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.meal-table {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: collapse;
+  /* 고정 배분: 날짜 칸만 좁게 두고 세 끼는 같은 폭으로 나눕니다.
+     auto 로 두면 메뉴 글자 수에 따라 열 폭이 들쭉날쭉해집니다. */
+  table-layout: fixed;
+  font-size: 0.88rem;
+}
+
+.meal-table th,
+.meal-table td {
+  border: 1px solid var(--line);
+  vertical-align: top;
+  text-align: left;
+}
+
+/* position: sticky 는 border-collapse 표에서 열 정렬을 깨뜨려 쓰지 않습니다. */
+.meal-table thead th {
+  padding: 0.6rem 0.8rem;
+  background: var(--dept-color);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.meal-th-date {
+  width: 6.5rem;
+}
+
+/* 왼쪽 날짜 칸 */
+.meal-date {
+  padding: 0.8rem;
+  background: var(--dept-soft);
+  color: var(--dept-ink);
+  font-weight: 700;
+  white-space: nowrap;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.meal-date-md {
+  display: block;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.meal-date-dow {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.meal-date .badge {
+  margin-top: 0.35rem;
+}
+
+.meal-table tr.today .meal-date {
+  background: var(--dept-color);
+  color: #ffffff;
+}
+
+.meal-table tr.today .meal-date-dow {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* 메뉴 칸 — 한 줄에 한 메뉴 */
+.meal-cell {
+  padding: 0.8rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.meal-cell.empty {
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+/* 원문의 빈 줄(일품과 일반 세트 구분)을 간격으로 표현합니다. */
+.meal-gap {
+  height: 0.55rem;
+}
+
+/* 주 이동 줄 — 좁은 화면에서 세 줄로 벌어지지 않게 */
+.meal-week-nav {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.meal-week-nav strong {
+  flex: 1 1 auto;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.meal-week-nav .ghost-button {
+  flex: 0 0 auto;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+/* 좁은 화면에서는 '2026년 9월 14일 주' 라벨이 버튼과 한 줄에 못 들어갑니다.
+   flex 줄바꿈으로는 버튼 두 개가 각각 다른 줄로 흩어져서, 라벨을 위 한 줄
+   전체로 두고 버튼을 양끝에 붙이는 2열 그리드로 확실히 고정합니다. */
+@media (max-width: 720px) {
+  .meal-week-nav {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .meal-week-nav strong {
+    grid-column: 1 / -1;
+  }
+}
+
+/* '오늘의 급식' 버튼 — 누르면 이번 주로 돌아옵니다. */
+.meal-today-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--dept-color);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  color: var(--dept-ink);
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.meal-today-btn.active {
+  background: var(--dept-color);
+  color: #ffffff;
+}
+
+/* 오늘 줄은 표 안에서 박스로 또렷하게 둘러 줍니다. */
+.meal-table tr.today > * {
+  border-top: 2px solid var(--dept-color);
+  border-bottom: 2px solid var(--dept-color);
+  background: var(--dept-soft);
+}
+
+.meal-table tr.today > *:first-child {
+  border-left: 2px solid var(--dept-color);
+}
+
+.meal-table tr.today > *:last-child {
+  border-right: 2px solid var(--dept-color);
+}
+
+/* 홈 '오늘의 급식' 카드 — 메뉴를 한 줄씩 */
+.meal-today-list {
+  display: grid;
+  gap: 0.15rem;
+  font-size: 1rem;
+  line-height: 1.55;
 }

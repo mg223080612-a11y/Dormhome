@@ -300,6 +300,18 @@ const toDateKey = (date) =>
 
 const WEEKDAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
 
+/** 한 끼 칸 — 줄바꿈 그대로 한 줄씩. 빈 줄은 구분 간격으로 둡니다. */
+function MealCell({ text }) {
+  if (!text) return <td className="meal-cell empty">—</td>;
+  return (
+    <td className="meal-cell">
+      {text.split('\n').map((line, index) =>
+        line ? <div key={index}>{line}</div> : <div key={index} className="meal-gap" />
+      )}
+    </td>
+  );
+}
+
 export function MealPage() {
   // 0 = 이번 주, -1 = 지난 주, 1 = 다음 주
   const [weekOffset, setWeekOffset] = useState(0);
@@ -329,13 +341,16 @@ export function MealPage() {
   });
 
   return (
-    <PageShell title="급식" description="주간 급식표입니다. 월요일부터 일요일까지 보여줍니다.">
-      <div className="between toolbar">
+    <PageShell title="급식" description="주간 급식표">
+      <div className="between toolbar meal-week-nav">
         <button type="button" className="ghost-button" onClick={() => setWeekOffset(weekOffset - 1)}>‹ 지난 주</button>
-        <strong>
-          {monday.getFullYear()}년 {monday.getMonth() + 1}월 {monday.getDate()}일 주
-          {weekOffset === 0 && ' (이번 주)'}
-        </strong>
+        <button
+          type="button"
+          className={weekOffset === 0 ? 'meal-today-btn active' : 'meal-today-btn'}
+          onClick={() => setWeekOffset(0)}
+        >
+          오늘의 급식
+        </button>
         <button type="button" className="ghost-button" onClick={() => setWeekOffset(weekOffset + 1)}>다음 주 ›</button>
       </div>
 
@@ -344,40 +359,36 @@ export function MealPage() {
       ) : !hasAny ? (
         <EmptyState text="이 주의 급식이 아직 등록되지 않았습니다." />
       ) : (
-        <div className="meal-week">
-          {week.map((day) => {
-            const meal = byDate[day.key] || {};
-            const isToday = day.key === todayKey;
-            return (
-              <article key={day.key} className={isToday ? 'meal-day today' : 'meal-day'}>
-                <header className="meal-day-head">
-                  <strong>{day.label}</strong>
-                  <small>{day.date.getMonth() + 1}/{day.date.getDate()}</small>
-                  {isToday && <span className="badge">오늘</span>}
-                </header>
-                <div className="meal-day-body">
-                  {[
-                    ['아침', meal.breakfast],
-                    ['점심', meal.lunch],
-                    ['저녁', meal.dinner]
-                  ].map(([label, value]) => (
-                    <div key={label} className="meal-slot">
-                      <span className="meal-slot-label">{label}</span>
-                      {value ? (
-                        <ul>
-                          {value.split('\n').filter(Boolean).map((item, i) => (
-                            <li key={`${label}-${i}`}>{item}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="meal-slot-empty">—</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </article>
-            );
-          })}
+        // 표가 좁은 화면보다 넓어질 수 있어 가로 스크롤을 둡니다.
+        <div className="meal-table-wrap">
+          <table className="meal-table">
+            <thead>
+              <tr>
+                <th className="meal-th-date">날짜</th>
+                <th>아침</th>
+                <th>점심</th>
+                <th>저녁</th>
+              </tr>
+            </thead>
+            <tbody>
+              {week.map((day) => {
+                const meal = byDate[day.key] || {};
+                const isToday = day.key === todayKey;
+                return (
+                  <tr key={day.key} className={isToday ? 'today' : undefined}>
+                    <th scope="row" className="meal-date">
+                      <span className="meal-date-md">{day.key.slice(5).replace('-', '-')}</span>
+                      <span className="meal-date-dow">({day.label})</span>
+                      {isToday && <span className="badge">오늘</span>}
+                    </th>
+                    <MealCell text={meal.breakfast} />
+                    <MealCell text={meal.lunch} />
+                    <MealCell text={meal.dinner} />
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </PageShell>
