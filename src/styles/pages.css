@@ -1506,10 +1506,12 @@ button.feature-card:hover {
   border-right: 2px solid var(--dept-color);
 }
 
-/* 홈 '오늘의 급식' 카드 — 메뉴를 한 줄씩 */
+/* 홈 '오늘의 급식' 카드 — 메뉴를 한 줄씩, 굵게 하지 않습니다 */
 .meal-today-list {
   display: grid;
   gap: 0.15rem;
   font-size: 1rem;
-  line-height: 1.55;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--ink);
 }

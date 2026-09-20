@@ -35,6 +35,8 @@ export default function Dashboard({ onNavigate }) {
   const mealPeriod = getMealPeriod();
   // 오늘 날짜의 급식만 D1 에서 읽어옵니다.
   const today = todayKey();
+  // 라벨에 쓸 '9/20' 형식 (앞의 0 없이)
+  const todayLabel = `${new Date().getMonth() + 1}/${new Date().getDate()}`;
   const { data: meals } = useApiData(`/api/meals?from=${today}&to=${today}`, []);
   const todayMeal = meals[0] || null;
   const mealText = todayMeal?.[mealPeriod] || '오늘 급식 정보가 아직 없어요';
@@ -48,13 +50,15 @@ export default function Dashboard({ onNavigate }) {
       <section className="section">
         <div className="feature-grid feature-grid-single">
           <button type="button" className="feature-card" onClick={() => onNavigate('meal')}>
-            <span className="feature-label">오늘의 급식 · {MEAL_PERIOD_LABEL[mealPeriod]}</span>
-            {/* 메뉴가 줄바꿈으로 저장돼 있어 한 줄씩 나눠 보여줍니다. */}
-            <strong className="feature-value meal-today-list">
+            <span className="feature-label">
+              {todayLabel} 오늘의 급식 ({MEAL_PERIOD_LABEL[mealPeriod]})
+            </span>
+            {/* 메뉴가 줄바꿈으로 저장돼 있어 한 줄씩 나눠 보여줍니다. (굵게 하지 않습니다) */}
+            <div className="meal-today-list">
               {mealText.split('\n').map((line, index) =>
                 line ? <span key={index}>{line}</span> : null
               )}
-            </strong>
+            </div>
           </button>
         </div>
       </section>
