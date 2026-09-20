@@ -118,7 +118,7 @@ async function verifyIdToken(token, projectId) {
  */
 async function requireUser(request, env) {
   const authorization = request.headers.get('Authorization') || '';
-  const token = authorization.replace(/^Bearers+/i, '').trim();
+  const token = authorization.replace(/^Bearer\s+/i, '').trim();
   if (!token) return { error: '로그인이 필요합니다.', status: 401 };
 
   let payload;
