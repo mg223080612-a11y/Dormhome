@@ -187,7 +187,7 @@ async function writeDoc(db, key, data, email) {
 }
 
 /** 'YYYY-MM-DD' 형식인지 확인 */
-const DATE_ONLY = /^d{4}-d{2}-d{2}$/;
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 
 /** 오늘로부터 n일 뒤(음수면 이전)의 날짜 문자열 */
 const shiftDate = (days) => {
