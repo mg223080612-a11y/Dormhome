@@ -273,8 +273,17 @@ export async function onRequest(context) {
         const body = await request.json();
         if (!Array.isArray(body)) return fail('급식표는 배열이어야 합니다.');
 
+        if (body.length === 0) return fail('저장할 내용이 없습니다.');
+
         const rows = body.filter((item) => DATE_ONLY.test(String(item?.date || '')));
-        if (rows.length === 0) return fail('저장할 날짜가 없습니다.');
+
+        // 날짜가 하나도 없으면 예전 형식(요일 기반)을 보낸 것입니다.
+        // 화면이 배포 전 버전으로 열려 있을 때 생기므로 새로고침을 안내합니다.
+        if (rows.length === 0) {
+          return fail(
+            '화면이 예전 버전이라 저장할 수 없습니다. 새로고침(Ctrl+Shift+R) 후 다시 시도해 주세요.'
+          );
+        }
         if (rows.length !== body.length) {
           return fail('날짜 형식이 올바르지 않은 항목이 있습니다. (YYYY-MM-DD)');
         }
