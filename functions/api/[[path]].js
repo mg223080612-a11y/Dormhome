@@ -23,6 +23,11 @@
 //   GET    /api/events            달력 일정
 //   POST   /api/events            일정 추가
 //   DELETE /api/events/:id        일정 삭제
+//   GET    /api/taxi              택시메이트 목록 (신청자 포함)
+//   POST   /api/taxi              택시메이트 등록 (학생 누구나)
+//   POST   /api/taxi/:id/join     같이 타기 신청
+//   DELETE /api/taxi/:id/join     신청 취소
+//   DELETE /api/taxi/:id          글 삭제 (글쓴이만)
 //   GET    /api/surveys           설문 목록
 //   POST   /api/surveys           설문 추가
 //   DELETE /api/surveys/:id       설문 삭제
@@ -106,10 +111,14 @@ async function verifyIdToken(token, projectId) {
   return payload;
 }
 
-/** 쓰기 권한 확인 — 학교 도메인 + ADMIN_EMAILS 에 등록된 관리자만 통과 */
-async function requireWriter(request, env) {
+/**
+ * 로그인 확인 — 토큰이 유효하고 학교 도메인 계정이면 통과.
+ * 택시메이트처럼 학생 누구나 쓰는 기능에 씁니다.
+ * 이름/이메일은 클라이언트가 보낸 값이 아니라 여기서 꺼낸 것만 씁니다.
+ */
+async function requireUser(request, env) {
   const authorization = request.headers.get('Authorization') || '';
-  const token = authorization.replace(/^Bearer\s+/i, '').trim();
+  const token = authorization.replace(/^Bearers+/i, '').trim();
   if (!token) return { error: '로그인이 필요합니다.', status: 401 };
 
   let payload;
@@ -122,15 +131,23 @@ async function requireWriter(request, env) {
   const email = String(payload.email || '').toLowerCase();
 
   if (!payload.email_verified) {
-    return { error: '이메일 인증이 완료된 계정만 수정할 수 있습니다.', status: 403 };
+    return { error: '이메일 인증이 완료된 계정만 이용할 수 있습니다.', status: 403 };
   }
 
   const domain = email.split('@')[1] || '';
   if (domain !== String(env.ALLOWED_DOMAIN || '').toLowerCase()) {
-    return { error: `@${env.ALLOWED_DOMAIN} 계정만 수정할 수 있습니다.`, status: 403 };
+    return { error: `@${env.ALLOWED_DOMAIN} 계정만 이용할 수 있습니다.`, status: 403 };
   }
 
-  // 쓰기는 ADMIN_EMAILS 에 등록된 계정만 가능합니다.
+  const name = String(payload.name || '').trim() || email.split('@')[0];
+  return { email, name };
+}
+
+/** 관리자 확인 — 로그인 확인에 더해 ADMIN_EMAILS 에 등록돼 있어야 합니다. */
+async function requireWriter(request, env) {
+  const user = await requireUser(request, env);
+  if (user.error) return user;
+
   // 목록이 비어 있으면 '아무도 못 쓴다'로 동작합니다(fail-closed).
   // 설정이 빠졌을 때 조용히 전체 공개가 되는 쪽이 훨씬 위험하기 때문입니다.
   const admins = String(env.ADMIN_EMAILS || '')
@@ -146,11 +163,11 @@ async function requireWriter(request, env) {
     };
   }
 
-  if (!admins.includes(email)) {
+  if (!admins.includes(user.email)) {
     return { error: '관리자로 등록된 계정만 수정할 수 있습니다.', status: 403 };
   }
 
-  return { email };
+  return user;
 }
 
 const json = (data, status = 200) =>
@@ -216,10 +233,15 @@ export async function onRequest(context) {
   }
 
   // 쓰기 요청이면 먼저 권한을 확인합니다.
+  //   택시메이트는 학생이 직접 등록·신청하는 기능이라 로그인만 확인하고,
+  //   나머지(말씀·급식·공약·일정·설문)는 관리자만 고칠 수 있습니다.
   const needsAuth = method !== 'GET' && method !== 'HEAD';
+  const studentWritable = pathname === '/api/taxi' || pathname.startsWith('/api/taxi/');
   let writer = null;
   if (needsAuth) {
-    const result = await requireWriter(request, env);
+    const result = studentWritable
+      ? await requireUser(request, env)
+      : await requireWriter(request, env);
     if (result.error) return fail(result.error, result.status);
     writer = result;
   }
@@ -432,6 +454,160 @@ export async function onRequest(context) {
       const id = decodeURIComponent(pathname.slice('/api/events/'.length));
       await db.prepare('DELETE FROM events WHERE id = ?').bind(id).run();
       return json({ ok: true });
+    }
+
+    // ── 택시메이트 ─────────────────────────────────────────
+    //   학교 계정이면 누구나 등록하고 '같이 타기' 신청을 할 수 있습니다.
+    //   글쓴이/신청자 이름은 토큰에서 꺼낸 값만 씁니다(위조 방지).
+    if (pathname === '/api/taxi') {
+      if (method === 'GET') {
+        const { results: rides } = await db
+          .prepare(
+            `SELECT id, date, time, destination, max, memo, author_email, author_name
+             FROM taxi ORDER BY date, time`
+          )
+          .all();
+        const { results: riders } = await db
+          .prepare('SELECT taxi_id, email, name FROM taxi_riders ORDER BY joined_at')
+          .all();
+
+        const byRide = {};
+        riders.forEach((rider) => {
+          (byRide[rider.taxi_id] = byRide[rider.taxi_id] || []).push({
+            email: rider.email,
+            name: rider.name
+          });
+        });
+
+        return json(
+          rides.map((ride) => ({
+            id: ride.id,
+            date: ride.date,
+            time: ride.time,
+            destination: ride.destination,
+            max: ride.max,
+            memo: ride.memo,
+            author: ride.author_name,
+            authorEmail: ride.author_email,
+            riders: byRide[ride.id] || []
+          }))
+        );
+      }
+
+      if (method === 'POST') {
+        const body = await request.json();
+        if (!body.date || !body.time || !body.destination) {
+          return fail('날짜, 시간, 목적지를 모두 입력해 주세요.');
+        }
+        const max = Math.min(6, Math.max(2, Number(body.max) || 4));
+        const id = crypto.randomUUID();
+        const now = new Date().toISOString();
+
+        // 글쓴이는 자동으로 첫 번째 탑승자가 됩니다.
+        await db.batch([
+          db
+            .prepare(
+              `INSERT INTO taxi (id, date, time, destination, max, memo, author_email, author_name, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+            )
+            .bind(
+              id,
+              String(body.date),
+              String(body.time),
+              String(body.destination),
+              max,
+              String(body.memo || ''),
+              writer.email,
+              writer.name,
+              now
+            ),
+          db
+            .prepare('INSERT INTO taxi_riders (taxi_id, email, name, joined_at) VALUES (?, ?, ?, ?)')
+            .bind(id, writer.email, writer.name, now)
+        ]);
+
+        return json(
+          {
+            id,
+            date: String(body.date),
+            time: String(body.time),
+            destination: String(body.destination),
+            max,
+            memo: String(body.memo || ''),
+            author: writer.name,
+            authorEmail: writer.email,
+            riders: [{ email: writer.email, name: writer.name }]
+          },
+          201
+        );
+      }
+    }
+
+    if (pathname.startsWith('/api/taxi/')) {
+      const rest = pathname.slice('/api/taxi/'.length);
+      const [rawId, action] = rest.split('/');
+      const id = decodeURIComponent(rawId || '');
+
+      const ride = await db
+        .prepare('SELECT id, max, author_email FROM taxi WHERE id = ?')
+        .bind(id)
+        .first();
+      if (!ride) return fail('해당 택시메이트를 찾을 수 없습니다.', 404);
+
+      // 같이 타기 신청 / 취소
+      if (action === 'join') {
+        if (method === 'POST') {
+          const countRow = await db
+            .prepare('SELECT COUNT(*) AS n FROM taxi_riders WHERE taxi_id = ?')
+            .bind(id)
+            .first();
+          const already = await db
+            .prepare('SELECT email FROM taxi_riders WHERE taxi_id = ? AND email = ?')
+            .bind(id, writer.email)
+            .first();
+
+          if (!already && Number(countRow.n) >= Number(ride.max)) {
+            return fail('인원이 모두 찼습니다.', 409);
+          }
+
+          await db
+            .prepare(
+              `INSERT INTO taxi_riders (taxi_id, email, name, joined_at) VALUES (?, ?, ?, ?)
+               ON CONFLICT(taxi_id, email) DO NOTHING`
+            )
+            .bind(id, writer.email, writer.name, new Date().toISOString())
+            .run();
+        } else if (method === 'DELETE') {
+          // 글쓴이는 빠질 수 없습니다. 글을 지워야 합니다.
+          if (writer.email === ride.author_email) {
+            return fail('등록한 사람은 취소할 수 없습니다. 글을 삭제해 주세요.', 400);
+          }
+          await db
+            .prepare('DELETE FROM taxi_riders WHERE taxi_id = ? AND email = ?')
+            .bind(id, writer.email)
+            .run();
+        } else {
+          return fail('지원하지 않는 방식입니다.', 405);
+        }
+
+        const { results } = await db
+          .prepare('SELECT email, name FROM taxi_riders WHERE taxi_id = ? ORDER BY joined_at')
+          .bind(id)
+          .all();
+        return json({ id, riders: results });
+      }
+
+      // 글 삭제 — 글쓴이만
+      if (!action && method === 'DELETE') {
+        if (writer.email !== ride.author_email) {
+          return fail('등록한 사람만 삭제할 수 있습니다.', 403);
+        }
+        await db.batch([
+          db.prepare('DELETE FROM taxi_riders WHERE taxi_id = ?').bind(id),
+          db.prepare('DELETE FROM taxi WHERE id = ?').bind(id)
+        ]);
+        return json({ ok: true });
+      }
     }
 
     // ── 설문 ───────────────────────────────────────────────

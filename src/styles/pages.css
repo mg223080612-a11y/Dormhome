@@ -1515,3 +1515,90 @@ button.feature-card:hover {
   line-height: 1.6;
   color: var(--ink);
 }
+
+/* ── 택시메이트 ──────────────────────────────────────────── */
+.taxi-card {
+  gap: 0.55rem;
+}
+
+.taxi-when {
+  margin: 0;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 등록한 사람 — 눈에 바로 들어오게 */
+.taxi-author {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.taxi-author-label {
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  background: var(--dept-soft);
+  color: var(--dept-ink);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.taxi-me {
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm);
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* 같이 타는 사람 목록 */
+.taxi-riders {
+  padding: 0.6rem 0.75rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-sm);
+  background: #fafafa;
+}
+
+.taxi-riders-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.taxi-riders ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.taxi-riders li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  font-size: 0.85rem;
+}
+
+.taxi-riders li.me {
+  border-color: #16a34a;
+  color: #15803d;
+  font-weight: 700;
+}
+
+.taxi-tag {
+  color: var(--dept-ink);
+  font-size: 0.7rem;
+  font-weight: 800;
+}

@@ -47,6 +47,32 @@ CREATE TABLE IF NOT EXISTS events (
 
 CREATE INDEX IF NOT EXISTS idx_events_date ON events (date);
 
+-- 택시메이트
+--   글쓴이와 신청자 정보는 클라이언트가 보낸 값이 아니라
+--   서버가 검증한 로그인 토큰에서 꺼내 씁니다. (이름 위조 방지)
+CREATE TABLE IF NOT EXISTS taxi (
+  id           TEXT PRIMARY KEY,
+  date         TEXT NOT NULL,          -- YYYY-MM-DD
+  time         TEXT NOT NULL,          -- HH:MM
+  destination  TEXT NOT NULL,
+  max          INTEGER NOT NULL DEFAULT 4,
+  memo         TEXT NOT NULL DEFAULT '',
+  author_email TEXT NOT NULL,
+  author_name  TEXT NOT NULL,
+  created_at   TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_taxi_date ON taxi (date, time);
+
+-- 같이 타기 신청자. 글쓴이도 등록 시 자동으로 한 명으로 들어갑니다.
+CREATE TABLE IF NOT EXISTS taxi_riders (
+  taxi_id   TEXT NOT NULL,
+  email     TEXT NOT NULL,
+  name      TEXT NOT NULL,
+  joined_at TEXT NOT NULL,
+  PRIMARY KEY (taxi_id, email)
+);
+
 -- 설문 링크
 CREATE TABLE IF NOT EXISTS surveys (
   id          TEXT PRIMARY KEY,

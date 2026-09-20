@@ -90,3 +90,14 @@ export const getSurveys = () => apiFetch('/api/surveys');
 export const addSurvey = (survey) => apiFetch('/api/surveys', { method: 'POST', body: survey });
 export const removeSurvey = (id) =>
   apiFetch(`/api/surveys/${encodeURIComponent(id)}`, { method: 'DELETE' });
+
+// ── 택시메이트 ───────────────────────────────────────────────
+// 글쓴이/신청자 이름은 서버가 로그인 토큰에서 꺼내 쓰므로 여기서 보내지 않습니다.
+export const getTaxi = () => apiFetch('/api/taxi');
+export const addTaxi = (ride) => apiFetch('/api/taxi', { method: 'POST', body: ride });
+export const joinTaxi = (id) =>
+  apiFetch(`/api/taxi/${encodeURIComponent(id)}/join`, { method: 'POST' });
+export const leaveTaxi = (id) =>
+  apiFetch(`/api/taxi/${encodeURIComponent(id)}/join`, { method: 'DELETE' });
+export const removeTaxi = (id) =>
+  apiFetch(`/api/taxi/${encodeURIComponent(id)}`, { method: 'DELETE' });

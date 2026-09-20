@@ -5,13 +5,13 @@ import {
   academicEvents,
   events,
   initialMarketItems,
-  initialTaxiRequests,
   pledgeDepartments,
   pledges,
   shortforms,
   weeklyVerse
 } from '../data/mockData';
 import { addStorageItem, readStorage, writeStorage } from '../utils/storage';
+import { addTaxi, joinTaxi, leaveTaxi, removeTaxi } from '../utils/api';
 import useApiData from '../utils/useApiData';
 
 const dateLabel = (value) => {
@@ -192,31 +192,53 @@ export function EventPage({ session }) {
 }
 
 export function TaxiMatePage({ session }) {
-  const [items, setItems] = useState(() => readStorage('taxi-requests', initialTaxiRequests));
+  const { data: items, setData: setItems, loading, error, reload } = useApiData('/api/taxi', []);
   const [form, setForm] = useState({ date: '', time: '', destination: '', max: 4, memo: '' });
+  const [actionError, setActionError] = useState(null);
+  const [busyId, setBusyId] = useState(null);
 
-  const submit = (event) => {
+  const myEmail = (session?.email || '').toLowerCase();
+
+  const submit = async (event) => {
     event.preventDefault();
     if (!form.date || !form.time || !form.destination) return;
+    setActionError(null);
+    try {
+      const created = await addTaxi({ ...form, max: Number(form.max) });
+      setItems([...items, created].sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`)));
+      setForm({ date: '', time: '', destination: '', max: 4, memo: '' });
+    } catch (err) {
+      setActionError(err.message || '등록에 실패했습니다.');
+    }
+  };
 
-    const next = addStorageItem(
-      'taxi-requests',
-      {
-        ...form,
-        author: session.name,
-        max: Number(form.max)
-      },
-      initialTaxiRequests
-    );
-    setItems(next);
-    setForm({ date: '', time: '', destination: '', max: 4, memo: '' });
+  // 같이 타기 신청 / 취소 — 서버가 돌려준 신청자 목록으로 바로 갱신합니다.
+  const toggleJoin = async (ride, joined) => {
+    setActionError(null);
+    setBusyId(ride.id);
+    try {
+      const result = joined ? await leaveTaxi(ride.id) : await joinTaxi(ride.id);
+      setItems(items.map((item) => (item.id === ride.id ? { ...item, riders: result.riders } : item)));
+    } catch (err) {
+      setActionError(err.message || '신청에 실패했습니다.');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const remove = async (ride) => {
+    if (!window.confirm('이 택시메이트를 삭제할까요?')) return;
+    setActionError(null);
+    try {
+      await removeTaxi(ride.id);
+      setItems(items.filter((item) => item.id !== ride.id));
+    } catch (err) {
+      setActionError(err.message || '삭제에 실패했습니다.');
+    }
   };
 
   return (
-    <PageShell
-      title="택시메이트"
-      description="함께 택시를 탈 친구를 찾는 화면입니다. 실제 운영 시에는 서버 권한 규칙으로 보호해야 합니다."
-    >
+    <PageShell title="택시메이트" description="함께 택시를 탈 친구를 찾습니다.">
       <form className="inline-form" onSubmit={submit}>
         <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
         <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} />
@@ -226,19 +248,83 @@ export function TaxiMatePage({ session }) {
         <button type="submit">등록</button>
       </form>
 
-      <div className="list-grid">
-        {items.map((item) => (
-          <article key={item.id} className="simple-card">
-            <div className="between">
-              <h3>{item.destination}</h3>
-              <span className="badge">최대 {item.max}명</span>
-            </div>
-            <p>{item.date} {item.time}</p>
-            <small>{item.memo || '메모 없음'} · 작성자 {item.author}</small>
-          </article>
-        ))}
-        {items.length === 0 && <EmptyState text="아직 등록된 택시메이트가 없습니다." />}
-      </div>
+      {error && (
+        <p className="admin-error">
+          목록을 불러오지 못했습니다.{' '}
+          <button type="button" className="admin-retry" onClick={reload}>다시 시도</button>
+        </p>
+      )}
+      {actionError && <p className="admin-error">{actionError}</p>}
+
+      {loading ? (
+        <EmptyState text="불러오는 중…" />
+      ) : items.length === 0 ? (
+        <EmptyState text="아직 등록된 택시메이트가 없습니다." />
+      ) : (
+        <div className="list-grid top-gap">
+          {items.map((ride) => {
+            const riders = ride.riders || [];
+            const joined = riders.some((rider) => rider.email?.toLowerCase() === myEmail);
+            const isAuthor = ride.authorEmail?.toLowerCase() === myEmail;
+            const full = riders.length >= ride.max;
+
+            return (
+              <article key={ride.id} className="simple-card taxi-card">
+                <div className="between">
+                  <h3>{ride.destination}</h3>
+                  <span className="badge">{riders.length}/{ride.max}명</span>
+                </div>
+
+                <p className="taxi-when">{ride.date} {ride.time}</p>
+
+                {/* 등록한 사람 */}
+                <p className="taxi-author">
+                  <span className="taxi-author-label">등록</span>
+                  {ride.author}
+                  {isAuthor && <span className="taxi-me">나</span>}
+                </p>
+
+                {ride.memo && <small>{ride.memo}</small>}
+
+                {/* 같이 타는 사람 — 신청하면 바로 여기에 나옵니다 */}
+                <div className="taxi-riders">
+                  <span className="taxi-riders-label">같이 타는 사람 {riders.length}명</span>
+                  <ul>
+                    {riders.map((rider) => (
+                      <li key={rider.email} className={rider.email?.toLowerCase() === myEmail ? 'me' : undefined}>
+                        {rider.name}
+                        {rider.email?.toLowerCase() === ride.authorEmail?.toLowerCase() && (
+                          <span className="taxi-tag">등록자</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="button-row">
+                  <button
+                    type="button"
+                    className={joined ? 'ghost-button' : undefined}
+                    disabled={busyId === ride.id || isAuthor || (!joined && full)}
+                    onClick={() => toggleJoin(ride, joined)}
+                  >
+                    {isAuthor
+                      ? '내가 등록함'
+                      : joined
+                        ? '신청 취소'
+                        : full
+                          ? '인원 마감'
+                          : '같이 타기'}
+                  </button>
+                  {isAuthor && (
+                    <button type="button" className="ghost-button" onClick={() => remove(ride)}>삭제</button>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </PageShell>
   );
 }
