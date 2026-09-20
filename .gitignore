@@ -4,3 +4,6 @@ dist
 .env
 .firebase
 .wrangler
+개발일지.md
+GVCS_홈페이지_개발일지.docx
+*.docx
